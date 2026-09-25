@@ -16,187 +16,990 @@
         body {
             margin: 0;
             font-family: Tahoma, Arial, sans-serif;
-            background: #f4f7fb;
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #1e293b;
         }
 
-        .login-box {
+        .container {
             width: 100%;
-            max-width: 420px;
+            max-width: 430px;
+            padding: 20px;
+        }
+
+        .card {
             background: white;
-            padding: 35px;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.10);
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
             border-radius: 18px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            background: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
         }
 
         h1 {
             text-align: center;
-            margin-top: 0;
-            margin-bottom: 10px;
+            margin: 0 0 8px;
+            font-size: 25px;
         }
 
         .subtitle {
             text-align: center;
-            color: #777;
-            margin-bottom: 30px;
+            color: #64748b;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
+            font-size: 14px;
             font-weight: bold;
         }
 
         input {
             width: 100%;
-            padding: 13px;
-            border: 1px solid #ddd;
+            padding: 13px 14px;
+            border: 1px solid #cbd5e1;
             border-radius: 10px;
-            margin-bottom: 18px;
             font-size: 15px;
-            direction: ltr;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10);
         }
 
         button {
             width: 100%;
-            padding: 14px;
             border: none;
             border-radius: 10px;
-            background: #2563eb;
-            color: white;
-            font-size: 16px;
+            padding: 13px;
+            font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        button:hover {
-            opacity: 0.9;
+        .primary {
+            background: #4f46e5;
+            color: white;
         }
 
-        #message {
-            margin-top: 18px;
-            text-align: center;
-            min-height: 24px;
+        .primary:hover {
+            background: #4338ca;
+        }
+
+        .secondary {
+            background: #f1f5f9;
+            color: #334155;
+            margin-top: 10px;
+        }
+
+        .secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .link-button {
+            background: transparent;
+            color: #4f46e5;
+            margin-top: 12px;
+            padding: 8px;
+        }
+
+        .link-button:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            line-height: 1.8;
         }
 
         .success {
-            color: green;
+            display: block;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
         }
 
         .error {
-            color: #dc2626;
+            display: block;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .info {
+            display: block;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .account-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+            line-height: 2;
+        }
+
+        .account-title {
+            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .account-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 5px 0;
+        }
+
+        .account-row:last-child {
+            border-bottom: none;
+        }
+
+        .role {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 2px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 18px;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
     </style>
 </head>
 
 <body>
 
-<div class="login-box">
+<div class="container">
 
-    <h1>سامانه مدرسه</h1>
+    <!-- LOGIN -->
+    <div id="loginCard" class="card">
 
-    <div class="subtitle">
-        ورود به حساب کاربری
-    </div>
+        <div class="logo">🏫</div>
 
-    <form id="loginForm">
+        <h1>سامانه مدیریت مدرسه</h1>
+        <div class="subtitle">ورود به حساب کاربری</div>
 
-        <label for="email">
-            ایمیل
-        </label>
+        <div id="loginMessage" class="message"></div>
 
-        <input
-            type="email"
-            id="email"
-            placeholder="example@email.com"
-            required
-        >
+        <form id="loginForm">
 
-        <label for="password">
-            رمز عبور
-        </label>
+            <div class="form-group">
+                <label for="loginEmail">ایمیل</label>
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="ایمیل خود را وارد کنید"
+                    required
+                    autocomplete="email"
+                >
+            </div>
 
-        <input
-            type="password"
-            id="password"
-            placeholder="رمز عبور"
-            required
-        >
+            <div class="form-group">
+                <label for="loginPassword">رمز عبور</label>
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="رمز عبور"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
 
-        <button type="submit">
-            ورود
+            <button type="submit" id="loginButton" class="primary">
+                ورود
+            </button>
+
+        </form>
+
+        <button id="forgotButton" class="link-button">
+            فراموشی رمز عبور
         </button>
 
-    </form>
+        <div class="footer">
+            سامانه مدیریت مدرسه
+        </div>
+    </div>
 
-    <div id="message"></div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="forgotCard" class="card hidden">
+
+        <div class="logo">🔐</div>
+
+        <h1>بازیابی رمز عبور</h1>
+
+        <div class="subtitle">
+            ایمیل حساب کاربری خود را وارد کنید
+        </div>
+
+        <div id="forgotMessage" class="message"></div>
+
+        <form id="forgotForm">
+
+            <div class="form-group">
+                <label for="forgotEmail">ایمیل</label>
+
+                <input
+                    type="email"
+                    id="forgotEmail"
+                    placeholder="example@email.com"
+                    required
+                    autocomplete="email"
+                >
+            </div>
+
+            <button type="submit" id="forgotSubmit" class="primary">
+                ارسال لینک بازیابی
+            </button>
+
+        </form>
+
+        <button id="backToLoginFromForgot" class="secondary">
+            بازگشت به ورود
+        </button>
+
+    </div>
+
+
+    <!-- UPDATE PASSWORD -->
+    <div id="updatePasswordCard" class="card hidden">
+
+        <div class="logo">🔑</div>
+
+        <h1>تعیین رمز جدید</h1>
+
+        <div class="subtitle">
+            رمز جدید حساب کاربری خود را وارد کنید
+        </div>
+
+        <div id="updateMessage" class="message"></div>
+
+        <form id="updatePasswordForm">
+
+            <div class="form-group">
+                <label for="newPassword">رمز جدید</label>
+
+                <input
+                    type="password"
+                    id="newPassword"
+                    placeholder="حداقل 6 کاراکتر"
+                    minlength="6"
+                    required
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">تکرار رمز جدید</label>
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="رمز جدید را دوباره وارد کنید"
+                    minlength="6"
+                    required
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <button type="submit" id="updatePasswordButton" class="primary">
+                ذخیره رمز جدید
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ACCOUNT -->
+    <div id="accountCard" class="card hidden">
+
+        <div class="logo">👤</div>
+
+        <h1>ورود موفق</h1>
+
+        <div class="subtitle">
+            اطلاعات حساب کاربری
+        </div>
+
+        <div id="accountMessage" class="message"></div>
+
+        <div class="account-box">
+
+            <div class="account-title">
+                حساب کاربری شما
+            </div>
+
+            <div class="account-row">
+                <span>نام</span>
+                <strong id="accountName">-</strong>
+            </div>
+
+            <div class="account-row">
+                <span>مدرسه</span>
+                <strong id="accountSchool">-</strong>
+            </div>
+
+            <div class="account-row">
+                <span>نقش</span>
+                <strong id="accountRoles">-</strong>
+            </div>
+
+        </div>
+
+        <button id="logoutButton" class="secondary">
+            خروج از حساب
+        </button>
+
+    </div>
 
 </div>
 
+
 <script>
+
+    // =========================================================
+    // SUPABASE CONFIG
+    // =========================================================
 
     const SUPABASE_URL =
         "https://ebimjoeubatymlpthor.supabase.co";
 
+    // فقط Publishable Key را اینجا قرار بده.
+    // Secret Key را هرگز اینجا قرار نده.
     const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_00YDsLqILFIxhYgdZsRkyw_3CGXGhWb";
 
-    const { createClient } = window.supabase;
 
-    const supabase = createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    const { createClient } =
+        supabase;
+
+    const supabaseClient =
+        createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+        );
 
 
-    const loginForm = document.getElementById("loginForm");
-    const message = document.getElementById("message");
+    // =========================================================
+    // ELEMENTS
+    // =========================================================
 
+    const loginCard =
+        document.getElementById("loginCard");
+
+    const forgotCard =
+        document.getElementById("forgotCard");
+
+    const updatePasswordCard =
+        document.getElementById("updatePasswordCard");
+
+    const accountCard =
+        document.getElementById("accountCard");
+
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const forgotForm =
+        document.getElementById("forgotForm");
+
+    const updatePasswordForm =
+        document.getElementById("updatePasswordForm");
+
+
+    const forgotButton =
+        document.getElementById("forgotButton");
+
+    const backToLoginFromForgot =
+        document.getElementById("backToLoginFromForgot");
+
+    const logoutButton =
+        document.getElementById("logoutButton");
+
+
+    // =========================================================
+    // MESSAGE HELPERS
+    // =========================================================
+
+    function showMessage(element, text, type) {
+
+        element.textContent = text;
+
+        element.className =
+            "message " + type;
+
+    }
+
+
+    function hideMessage(element) {
+
+        element.textContent = "";
+
+        element.className =
+            "message";
+
+    }
+
+
+    // =========================================================
+    // CARD MANAGEMENT
+    // =========================================================
+
+    function showOnly(card) {
+
+        loginCard.classList.add("hidden");
+        forgotCard.classList.add("hidden");
+        updatePasswordCard.classList.add("hidden");
+        accountCard.classList.add("hidden");
+
+        card.classList.remove("hidden");
+
+    }
+
+
+    // =========================================================
+    // APP URL
+    // =========================================================
+
+    const APP_URL =
+        window.location.origin +
+        window.location.pathname;
+
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
 
     loginForm.addEventListener("submit", async function(event) {
 
         event.preventDefault();
 
-        message.textContent = "در حال ورود...";
-        message.className = "";
-
-
         const email =
-            document.getElementById("email").value.trim();
+            document.getElementById("loginEmail").value.trim();
 
         const password =
-            document.getElementById("password").value;
+            document.getElementById("loginPassword").value;
+
+        const button =
+            document.getElementById("loginButton");
+
+
+        hideMessage(
+            document.getElementById("loginMessage")
+        );
+
+
+        button.textContent = "در حال ورود...";
+        loginForm.classList.add("loading");
 
 
         const { data, error } =
-            await supabase.auth.signInWithPassword({
+            await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: password
             });
 
 
+        loginForm.classList.remove("loading");
+        button.textContent = "ورود";
+
+
         if (error) {
 
-            message.textContent =
-                "ورود ناموفق بود: " + error.message;
+            console.error(error);
 
-            message.className = "error";
+            showMessage(
+                document.getElementById("loginMessage"),
+                "ورود ناموفق بود. ایمیل یا رمز عبور را بررسی کنید.",
+                "error"
+            );
 
             return;
         }
 
 
-        message.textContent =
-            "ورود با موفقیت انجام شد.";
+        showMessage(
+            document.getElementById("loginMessage"),
+            "ورود با موفقیت انجام شد.",
+            "success"
+        );
 
-        message.className = "success";
 
-
-        console.log("Logged in user:", data.user);
+        await loadAccountInfo();
 
     });
+
+
+    // =========================================================
+    // LOAD ACCOUNT INFO
+    // =========================================================
+
+    async function loadAccountInfo() {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.rpc(
+                "get_my_account_info"
+            );
+
+
+        if (error) {
+
+            console.error(error);
+
+            showOnly(accountCard);
+
+            showMessage(
+                document.getElementById("accountMessage"),
+                "ورود موفق بود، اما دریافت اطلاعات حساب با خطا مواجه شد.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        console.log(
+            "Account info:",
+            data
+        );
+
+
+        const firstName =
+            data?.first_name || "";
+
+        const lastName =
+            data?.last_name || "";
+
+
+        document.getElementById("accountName")
+            .textContent =
+            (firstName + " " + lastName).trim() || "-";
+
+
+        document.getElementById("accountSchool")
+            .textContent =
+            data?.school_name || "-";
+
+
+        const roles =
+            data?.roles || [];
+
+
+        const rolesContainer =
+            document.getElementById("accountRoles");
+
+
+        rolesContainer.innerHTML = "";
+
+
+        if (roles.length === 0) {
+
+            rolesContainer.textContent = "-";
+
+        } else {
+
+            roles.forEach(function(roleItem) {
+
+                const span =
+                    document.createElement("span");
+
+                span.className = "role";
+
+                span.textContent =
+                    roleItem.role || "-";
+
+                rolesContainer.appendChild(span);
+
+            });
+
+        }
+
+
+        showOnly(accountCard);
+
+    }
+
+
+    // =========================================================
+    // FORGOT PASSWORD
+    // =========================================================
+
+    forgotButton.addEventListener("click", function() {
+
+        const loginEmail =
+            document.getElementById("loginEmail").value.trim();
+
+        document.getElementById("forgotEmail").value =
+            loginEmail;
+
+        hideMessage(
+            document.getElementById("forgotMessage")
+        );
+
+        showOnly(forgotCard);
+
+    });
+
+
+    // =========================================================
+    // SEND PASSWORD RECOVERY EMAIL
+    // =========================================================
+
+    forgotForm.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+
+        const email =
+            document.getElementById("forgotEmail")
+                .value
+                .trim();
+
+
+        const button =
+            document.getElementById("forgotSubmit");
+
+
+        hideMessage(
+            document.getElementById("forgotMessage")
+        );
+
+
+        button.textContent =
+            "در حال ارسال...";
+
+        forgotForm.classList.add("loading");
+
+
+        const {
+            error
+        } =
+            await supabaseClient.auth
+                .resetPasswordForEmail(
+                    email,
+                    {
+                        redirectTo: APP_URL
+                    }
+                );
+
+
+        forgotForm.classList.remove("loading");
+
+        button.textContent =
+            "ارسال لینک بازیابی";
+
+
+        if (error) {
+
+            console.error(error);
+
+            showMessage(
+                document.getElementById("forgotMessage"),
+                "ارسال لینک بازیابی انجام نشد: " +
+                error.message,
+                "error"
+            );
+
+            return;
+        }
+
+
+        showMessage(
+            document.getElementById("forgotMessage"),
+            "اگر این ایمیل در سامانه ثبت شده باشد، لینک بازیابی برای آن ارسال می‌شود. ایمیل خود را بررسی کنید.",
+            "success"
+        );
+
+    });
+
+
+    // =========================================================
+    // BACK TO LOGIN
+    // =========================================================
+
+    backToLoginFromForgot.addEventListener(
+        "click",
+        function() {
+
+            hideMessage(
+                document.getElementById("loginMessage")
+            );
+
+            showOnly(loginCard);
+
+        }
+    );
+
+
+    // =========================================================
+    // PASSWORD RECOVERY EVENT
+    // =========================================================
+
+    supabaseClient.auth.onAuthStateChange(
+        async function(event, session) {
+
+            console.log(
+                "Auth event:",
+                event
+            );
+
+
+            if (event === "PASSWORD_RECOVERY") {
+
+                showOnly(updatePasswordCard);
+
+                showMessage(
+                    document.getElementById("updateMessage"),
+                    "لطفاً رمز جدید خود را وارد کنید.",
+                    "info"
+                );
+
+            }
+
+        }
+    );
+
+
+    // =========================================================
+    // UPDATE PASSWORD
+    // =========================================================
+
+    updatePasswordForm.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const password =
+                document.getElementById("newPassword")
+                    .value;
+
+            const confirmPassword =
+                document.getElementById("confirmPassword")
+                    .value;
+
+
+            hideMessage(
+                document.getElementById("updateMessage")
+            );
+
+
+            if (password.length < 6) {
+
+                showMessage(
+                    document.getElementById("updateMessage"),
+                    "رمز عبور باید حداقل 6 کاراکتر باشد.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            if (password !== confirmPassword) {
+
+                showMessage(
+                    document.getElementById("updateMessage"),
+                    "رمزهای عبور یکسان نیستند.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const button =
+                document.getElementById(
+                    "updatePasswordButton"
+                );
+
+
+            button.textContent =
+                "در حال ذخیره...";
+
+            updatePasswordForm.classList.add("loading");
+
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient.auth.updateUser({
+                    password: password
+                });
+
+
+            updatePasswordForm.classList.remove("loading");
+
+            button.textContent =
+                "ذخیره رمز جدید";
+
+
+            if (error) {
+
+                console.error(error);
+
+                showMessage(
+                    document.getElementById("updateMessage"),
+                    "تغییر رمز انجام نشد: " +
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            showMessage(
+                document.getElementById("updateMessage"),
+                "رمز عبور با موفقیت تغییر کرد.",
+                "success"
+            );
+
+
+            document.getElementById("newPassword")
+                .value = "";
+
+            document.getElementById("confirmPassword")
+                .value = "";
+
+
+            setTimeout(
+                async function() {
+
+                    await loadAccountInfo();
+
+                },
+                1200
+            );
+
+        }
+    );
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    logoutButton.addEventListener(
+        "click",
+        async function() {
+
+            const {
+                error
+            } =
+                await supabaseClient.auth.signOut();
+
+
+            if (error) {
+
+                console.error(error);
+
+                return;
+            }
+
+
+            document.getElementById("loginEmail")
+                .value = "";
+
+            document.getElementById("loginPassword")
+                .value = "";
+
+
+            showOnly(loginCard);
+
+        }
+    );
+
+
+    // =========================================================
+    // INITIAL SESSION CHECK
+    // =========================================================
+
+    async function initializeApp() {
+
+        const {
+            data
+        } =
+            await supabaseClient.auth.getSession();
+
+
+        const session =
+            data?.session;
+
+
+        /*
+         * اگر کاربر قبلاً وارد شده باشد،
+         * اطلاعات حساب را نمایش می‌دهیم.
+         */
+
+        if (session) {
+
+            await loadAccountInfo();
+
+        }
+
+    }
+
+
+    // =========================================================
+    // START APP
+    // =========================================================
+
+    initializeApp();
 
 </script>
 
