@@ -1483,6 +1483,32 @@
                     </section>
 
 
+                    <!-- SUBJECTS -->
+                    <section id="subjectsPage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>📚 مدیریت دروس</h2>
+                                <p>تعریف و مدیریت درس‌های مدرسه و واحدهای هر درس</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshSubjectsButton" class="small-btn">🔄 بروزرسانی</button>
+                                <button id="addSubjectButton" class="small-btn">➕ افزودن درس</button>
+                            </div>
+                        </div>
+                        <div id="subjectsPageMessage" class="message"></div>
+                        <div class="toolbar">
+                            <input id="subjectSearchInput" type="search" placeholder="جستجو بر اساس نام درس یا کد...">
+                            <div id="subjectsCount" class="count">در حال دریافت...</div>
+                        </div>
+                        <div class="table-card"><div class="table-scroll">
+                            <table class="classes-table">
+                                <thead><tr><th>#</th><th>نام درس</th><th>کد</th><th>واحد</th><th>توضیحات</th><th>عملیات</th></tr></thead>
+                                <tbody id="subjectsTableBody"><tr><td colspan="6"><div class="empty-state">در حال دریافت دروس...</div></td></tr></tbody>
+                            </table>
+                        </div></div>
+                    </section>
+
+
                     <!-- OTHER MODULES -->
                     <section id="otherModulePage" class="module-page">
 
@@ -1539,6 +1565,40 @@
     <!-- =====================================================
          CLASS ADD / EDIT MODAL
          ===================================================== -->
+    <div id="subjectModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="subjectModalTitle">➕ افزودن درس</h3>
+                <button id="closeSubjectModal" type="button" class="modal-close">×</button>
+            </div>
+            <form id="subjectForm">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label for="subjectName">نام درس *</label>
+                        <input id="subjectName" type="text" required maxlength="150" placeholder="مثلاً ریاضی">
+                    </div>
+                    <div class="form-group">
+                        <label for="subjectCode">کد درس</label>
+                        <input id="subjectCode" type="text" maxlength="50" placeholder="مثلاً MATH01">
+                    </div>
+                    <div class="form-group">
+                        <label for="subjectUnits">واحد *</label>
+                        <input id="subjectUnits" type="number" min="0" step="0.5" value="1" required>
+                    </div>
+                    <div class="form-group full">
+                        <label for="subjectDescription">توضیحات</label>
+                        <textarea id="subjectDescription" rows="3" maxlength="500" placeholder="توضیحات اختیاری"></textarea>
+                    </div>
+                </div>
+                <div id="subjectFormMessage" class="message"></div>
+                <div class="modal-footer">
+                    <button id="cancelSubjectButton" type="button" class="small-btn">انصراف</button>
+                    <button id="saveSubjectButton" type="submit" class="small-btn success">💾 ذخیره درس</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="classModal" class="modal-overlay">
         <div class="modal-card class-modal-card">
             <div class="modal-header">
@@ -2022,6 +2082,9 @@
         const classesPage =
             document.getElementById("classesPage");
 
+        const subjectsPage =
+            document.getElementById("subjectsPage");
+
         const teachersPage =
             document.getElementById("teachersPage");
 
@@ -2031,6 +2094,7 @@
         home.classList.add("hidden");
         studentsPage.classList.remove("active");
         classesPage.classList.remove("active");
+        subjectsPage.classList.remove("active");
         teachersPage.classList.remove("active");
         otherPage.classList.remove("active");
 
@@ -2079,6 +2143,12 @@
         if (moduleName === "classes") {
             classesPage.classList.add("active");
             loadClasses();
+            return;
+        }
+
+        if (moduleName === "subjects") {
+            subjectsPage.classList.add("active");
+            loadSubjects();
             return;
         }
 
@@ -2391,6 +2461,225 @@
         if (event.key === "Escape") closeTeacherModal();
     });
 
+
+    /* =========================================================
+       SUBJECTS MANAGEMENT
+       ========================================================= */
+
+    let allSchoolSubjects = [];
+    let editingSubjectId = null;
+
+    const subjectModal = document.getElementById("subjectModal");
+    const subjectForm = document.getElementById("subjectForm");
+
+    function renderSubjects(subjects) {
+        const body = document.getElementById("subjectsTableBody");
+        const count = document.getElementById("subjectsCount");
+        count.textContent = `${subjects.length} درس`;
+
+        if (!subjects.length) {
+            body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📚</div><div>هنوز درسی ثبت نشده است.</div><div style="margin-top:7px;font-size:10px;">از «افزودن درس» استفاده کنید.</div></div></td></tr>`;
+            return;
+        }
+
+        body.innerHTML = subjects.map((x, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td><strong>${escapeHtml(x.name || "—")}</strong></td>
+                <td>${escapeHtml(x.code || "—")}</td>
+                <td>${escapeHtml(String(x.units ?? "—"))}</td>
+                <td>${escapeHtml(x.description || "—")}</td>
+                <td>
+                    <div class="student-actions">
+                        <button class="row-action edit" type="button" data-edit-subject="${escapeHtml(x.id)}">ویرایش</button>
+                        <button class="row-action disable" type="button" data-delete-subject="${escapeHtml(x.id)}">حذف</button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+
+        body.querySelectorAll("[data-edit-subject]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const item = allSchoolSubjects.find(x => String(x.id) === String(btn.dataset.editSubject));
+                if (item) openSubjectModal(item);
+            });
+        });
+
+        body.querySelectorAll("[data-delete-subject]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const item = allSchoolSubjects.find(x => String(x.id) === String(btn.dataset.deleteSubject));
+                if (!item) return;
+                if (!window.confirm(`آیا درس «${item.name}» حذف شود؟`)) return;
+
+                btn.disabled = true;
+                const { error } = await supabaseClient
+                    .from("subjects")
+                    .delete()
+                    .eq("id", item.id);
+
+                if (error) {
+                    showMessage(
+                        document.getElementById("subjectsPageMessage"),
+                        "حذف درس انجام نشد: " + error.message,
+                        "error"
+                    );
+                    btn.disabled = false;
+                    return;
+                }
+
+                showMessage(
+                    document.getElementById("subjectsPageMessage"),
+                    "درس با موفقیت حذف شد.",
+                    "success"
+                );
+                await loadSubjects();
+            });
+        });
+    }
+
+    async function loadSubjects() {
+        const body = document.getElementById("subjectsTableBody");
+        const count = document.getElementById("subjectsCount");
+        body.innerHTML = `<tr><td colspan="6"><div class="empty-state">در حال دریافت دروس...</div></td></tr>`;
+        count.textContent = "در حال دریافت...";
+        hideMessage(document.getElementById("subjectsPageMessage"));
+
+        const { data, error } = await supabaseClient
+            .from("subjects")
+            .select("id, school_id, name, code, units, description, created_at")
+            .order("name", { ascending: true });
+
+        if (error) {
+            body.innerHTML = `<tr><td colspan="6"><div class="empty-state">دریافت دروس با خطا مواجه شد.</div></td></tr>`;
+            count.textContent = "خطا";
+            showMessage(
+                document.getElementById("subjectsPageMessage"),
+                "دریافت دروس انجام نشد: " + error.message,
+                "error"
+            );
+            return;
+        }
+
+        allSchoolSubjects = data || [];
+        renderSubjects(allSchoolSubjects);
+    }
+
+    function openSubjectModal(item = null) {
+        editingSubjectId = item?.id || null;
+        document.getElementById("subjectModalTitle").textContent = item ? "✏️ ویرایش درس" : "➕ افزودن درس";
+        document.getElementById("subjectName").value = item?.name || "";
+        document.getElementById("subjectCode").value = item?.code || "";
+        document.getElementById("subjectUnits").value = item?.units ?? 1;
+        document.getElementById("subjectDescription").value = item?.description || "";
+        hideMessage(document.getElementById("subjectFormMessage"));
+        subjectModal.classList.add("open");
+        setTimeout(() => document.getElementById("subjectName").focus(), 50);
+    }
+
+    function closeSubjectModal() {
+        subjectModal.classList.remove("open");
+        editingSubjectId = null;
+        subjectForm.reset();
+        document.getElementById("subjectUnits").value = "1";
+        hideMessage(document.getElementById("subjectFormMessage"));
+    }
+
+    document.getElementById("addSubjectButton").addEventListener("click", () => openSubjectModal());
+    document.getElementById("closeSubjectModal").addEventListener("click", closeSubjectModal);
+    document.getElementById("cancelSubjectButton").addEventListener("click", closeSubjectModal);
+    subjectModal.addEventListener("click", e => {
+        if (e.target === subjectModal) closeSubjectModal();
+    });
+
+    document.getElementById("refreshSubjectsButton").addEventListener("click", async function () {
+        this.disabled = true;
+        try {
+            await loadSubjects();
+            if (typeof loadAssignmentData === "function") await loadAssignmentData();
+        } finally {
+            this.disabled = false;
+        }
+    });
+
+    subjectForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const button = document.getElementById("saveSubjectButton");
+        const message = document.getElementById("subjectFormMessage");
+        const name = document.getElementById("subjectName").value.trim();
+        const code = document.getElementById("subjectCode").value.trim() || null;
+        const units = Number(document.getElementById("subjectUnits").value);
+        const description = document.getElementById("subjectDescription").value.trim() || null;
+
+        if (!name) {
+            showMessage(message, "نام درس الزامی است.", "error");
+            return;
+        }
+        if (!Number.isFinite(units) || units < 0) {
+            showMessage(message, "تعداد واحد باید یک عدد معتبر و صفر یا بیشتر باشد.", "error");
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "در حال ذخیره...";
+        hideMessage(message);
+
+        try {
+            let result;
+            if (editingSubjectId) {
+                result = await supabaseClient
+                    .from("subjects")
+                    .update({ name, code, units, description })
+                    .eq("id", editingSubjectId)
+                    .select("id")
+                    .single();
+            } else {
+                const { data: account, error: accountError } = await supabaseClient.rpc("get_my_account_info");
+                if (accountError) throw accountError;
+                const schoolId = account?.school_id;
+                if (!schoolId) throw new Error("مدرسه حساب کاربری پیدا نشد.");
+
+                result = await supabaseClient
+                    .from("subjects")
+                    .insert({ school_id: schoolId, name, code, units, description })
+                    .select("id")
+                    .single();
+            }
+
+            if (result.error) throw result.error;
+
+            const wasEditing = Boolean(editingSubjectId);
+            closeSubjectModal();
+            showMessage(
+                document.getElementById("subjectsPageMessage"),
+                wasEditing ? "درس با موفقیت ویرایش شد." : "درس با موفقیت ایجاد شد.",
+                "success"
+            );
+            await loadSubjects();
+            if (typeof loadAssignmentData === "function") await loadAssignmentData();
+        } catch (err) {
+            console.error("subject save:", err);
+            showMessage(message, "ذخیره درس انجام نشد: " + err.message, "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = "💾 ذخیره درس";
+        }
+    });
+
+    document.getElementById("subjectSearchInput").addEventListener("input", function () {
+        const q = this.value.trim().toLowerCase();
+        if (!q) {
+            renderSubjects(allSchoolSubjects);
+            return;
+        }
+        renderSubjects(allSchoolSubjects.filter(x =>
+            [x.name, x.code, x.description, x.units]
+                .filter(v => v !== null && v !== undefined)
+                .join(" ")
+                .toLowerCase()
+                .includes(q)
+        ));
+    });
 
     /* =========================================================
        CLASSES MANAGEMENT
