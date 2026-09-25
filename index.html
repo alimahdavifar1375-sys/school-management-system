@@ -1509,6 +1509,124 @@
                     </section>
 
 
+
+
+                    <!-- ATTENDANCE -->
+                    <section id="attendancePage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>📋 مدیریت حضور و غیاب</h2>
+                                <p>ثبت حضور و غیاب دانش‌آموزان و مشاهده سوابق جلسات</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshAttendanceButton" class="small-btn">🔄 بروزرسانی</button>
+                            </div>
+                        </div>
+
+                        <div id="attendancePageMessage" class="message"></div>
+
+                        <div class="attendance-controls">
+                            <div class="form-group">
+                                <label for="attendanceClass">کلاس <span class="required">*</span></label>
+                                <select id="attendanceClass">
+                                    <option value="">در حال دریافت کلاس‌ها...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="attendanceDate">تاریخ جلسه <span class="required">*</span></label>
+                                <input id="attendanceDate" type="date" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="attendanceSessionNumber">شماره جلسه</label>
+                                <input id="attendanceSessionNumber" type="number" min="1" max="1000" value="1">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="attendanceTitle">عنوان جلسه</label>
+                                <input id="attendanceTitle" type="text" maxlength="150" placeholder="مثلاً جلسه اول ریاضی">
+                            </div>
+
+                            <div class="form-group full">
+                                <label for="attendanceTeacher">معلم ثبت‌کننده</label>
+                                <select id="attendanceTeacher">
+                                    <option value="">معلم فعلی / بدون انتخاب</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="attendance-summary" id="attendanceSummary">
+                            <span class="attendance-badge present">حاضر: 0</span>
+                            <span class="attendance-badge absent">غایب: 0</span>
+                            <span class="attendance-badge late">تأخیر: 0</span>
+                            <span class="attendance-badge excused">موجه: 0</span>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-scroll">
+                                <table class="attendance-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>دانش‌آموز</th>
+                                            <th>وضعیت حضور</th>
+                                            <th>توضیح</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendanceTableBody">
+                                        <tr><td colspan="4"><div class="empty-state"><div class="icon">📋</div><div>ابتدا کلاس را انتخاب کنید.</div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="attendance-actions">
+                            <button id="markAllPresentButton" class="small-btn">✅ همه حاضر</button>
+                            <button id="saveAttendanceButton" class="small-btn success">💾 ثبت حضور و غیاب</button>
+                        </div>
+
+                        <div class="table-card attendance-history-card">
+                            <div class="page-header" style="padding:15px 15px 0;margin-bottom:0">
+                                <div>
+                                    <h3 style="margin:0">📚 سوابق حضور و غیاب</h3>
+                                    <p>سوابق کلاس انتخاب‌شده در بازه تاریخ زیر نمایش داده می‌شود.</p>
+                                </div>
+                            </div>
+                            <div class="attendance-controls" style="border:0;border-radius:0;margin:0;padding:15px">
+                                <div class="form-group">
+                                    <label for="attendanceHistoryFrom">از تاریخ</label>
+                                    <input id="attendanceHistoryFrom" type="date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="attendanceHistoryTo">تا تاریخ</label>
+                                    <input id="attendanceHistoryTo" type="date">
+                                </div>
+                                <div class="form-group" style="display:flex;align-items:end">
+                                    <button id="loadAttendanceHistoryButton" type="button" class="small-btn" style="width:100%">🔎 نمایش سوابق</button>
+                                </div>
+                            </div>
+                            <div class="table-scroll">
+                                <table class="attendance-history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>تاریخ</th>
+                                            <th>جلسه</th>
+                                            <th>دانش‌آموز</th>
+                                            <th>وضعیت</th>
+                                            <th>توضیح</th>
+                                            <th>معلم</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendanceHistoryBody">
+                                        <tr><td colspan="6"><div class="empty-state">برای مشاهده سوابق، کلاس را انتخاب کنید.</div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+
                     <!-- OTHER MODULES -->
                     <section id="otherModulePage" class="module-page">
 
@@ -2088,6 +2206,9 @@
         const teachersPage =
             document.getElementById("teachersPage");
 
+        const attendancePage =
+            document.getElementById("attendancePage");
+
         const otherPage =
             document.getElementById("otherModulePage");
 
@@ -2096,6 +2217,7 @@
         classesPage.classList.remove("active");
         subjectsPage.classList.remove("active");
         teachersPage.classList.remove("active");
+        attendancePage.classList.remove("active");
         otherPage.classList.remove("active");
 
         document
@@ -2152,6 +2274,14 @@
             return;
         }
 
+        if (moduleName === "attendance") {
+            attendancePage.classList.add("active");
+            loadAttendanceModule().catch(function(error) {
+                console.error("دریافت حضور و غیاب انجام نشد:", error);
+            });
+            return;
+        }
+
         const info =
             moduleInfo[moduleName] || {
                 title: "بخش سامانه",
@@ -2187,6 +2317,379 @@
             });
 
         });
+
+
+
+
+    /* =========================================================
+       ATTENDANCE MANAGEMENT
+       ========================================================= */
+
+    let attendanceClasses = [];
+    let attendanceTeachers = [];
+    let attendanceStudents = [];
+    let attendanceRows = {};
+    let attendanceInitialized = false;
+
+    const attendanceStatusLabels = {
+        present: "حاضر",
+        absent: "غایب",
+        late: "تأخیر",
+        excused: "موجه"
+    };
+
+    function todayISO() {
+        const d = new Date();
+        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+        return local.toISOString().slice(0, 10);
+    }
+
+    function attendanceStatusText(status) {
+        return attendanceStatusLabels[status] || status || "—";
+    }
+
+    function attendanceDateText(value) {
+        if (!value) return "—";
+        try {
+            return new Intl.DateTimeFormat("fa-IR", {
+                year: "numeric", month: "2-digit", day: "2-digit"
+            }).format(new Date(value + "T00:00:00"));
+        } catch (_) {
+            return value;
+        }
+    }
+
+    function renderAttendanceSummary() {
+        const counts = { present: 0, absent: 0, late: 0, excused: 0 };
+        Object.values(attendanceRows).forEach(row => {
+            if (counts[row.status] !== undefined) counts[row.status]++;
+        });
+        document.getElementById("attendanceSummary").innerHTML = `
+            <span class="attendance-badge present">حاضر: ${counts.present}</span>
+            <span class="attendance-badge absent">غایب: ${counts.absent}</span>
+            <span class="attendance-badge late">تأخیر: ${counts.late}</span>
+            <span class="attendance-badge excused">موجه: ${counts.excused}</span>
+        `;
+    }
+
+    function setAttendanceStatus(studentId, status) {
+        if (!attendanceRows[studentId]) return;
+        attendanceRows[studentId].status = status;
+        renderAttendanceTable();
+    }
+
+    function renderAttendanceTable() {
+        const body = document.getElementById("attendanceTableBody");
+        if (!attendanceStudents.length) {
+            body.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="icon">👨‍🎓</div><div>دانش‌آموزی در این کلاس ثبت نشده است.</div></div></td></tr>`;
+            renderAttendanceSummary();
+            return;
+        }
+
+        body.innerHTML = attendanceStudents.map((student, index) => {
+            const row = attendanceRows[student.student_id] || { status: "present", note: "" };
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="attendance-student">${escapeHtml(student.first_name)} ${escapeHtml(student.last_name)}</div>
+                        <div class="attendance-student-meta">کد: ${escapeHtml(student.student_code || "—")} | شماره: ${escapeHtml(student.student_number || "—")}</div>
+                    </td>
+                    <td>
+                        <div class="attendance-status-group">
+                            ${Object.entries(attendanceStatusLabels).map(([status, label]) => `
+                                <button type="button"
+                                    class="attendance-status-btn ${status} ${row.status === status ? "selected" : ""}"
+                                    data-attendance-status="${status}"
+                                    data-student-id="${student.student_id}">${label}</button>
+                            `).join("")}
+                        </div>
+                    </td>
+                    <td>
+                        <input class="attendance-note-input"
+                            data-attendance-note="${student.student_id}"
+                            value="${escapeHtml(row.note || "")}"
+                            placeholder="توضیح اختیاری">
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        body.querySelectorAll("[data-attendance-status]").forEach(button => {
+            button.addEventListener("click", function() {
+                setAttendanceStatus(this.dataset.studentId, this.dataset.attendanceStatus);
+            });
+        });
+
+        body.querySelectorAll("[data-attendance-note]").forEach(input => {
+            input.addEventListener("input", function() {
+                if (attendanceRows[this.dataset.attendanceNote]) {
+                    attendanceRows[this.dataset.attendanceNote].note = this.value;
+                }
+            });
+        });
+
+        renderAttendanceSummary();
+    }
+
+    async function loadAttendanceClasses() {
+        const select = document.getElementById("attendanceClass");
+        select.disabled = true;
+        select.innerHTML = `<option value="">در حال دریافت کلاس‌ها...</option>`;
+
+        const { data, error } = await supabaseClient.rpc("get_my_school_classes");
+        if (error) throw error;
+
+        attendanceClasses = data || [];
+        select.innerHTML = attendanceClasses.length
+            ? `<option value="">انتخاب کلاس</option>${attendanceClasses.map(c => `
+                <option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}${c.grade ? " — " + escapeHtml(c.grade) : ""}${c.section ? " " + escapeHtml(c.section) : ""}</option>
+            `).join("")}`
+            : `<option value="">هیچ کلاسی ثبت نشده است</option>`;
+        select.disabled = false;
+
+        if (!select.value && attendanceClasses.length === 1) {
+            select.value = attendanceClasses[0].id;
+        }
+    }
+
+    async function loadAttendanceTeachers() {
+        const select = document.getElementById("attendanceTeacher");
+        select.innerHTML = `<option value="">معلم فعلی / بدون انتخاب</option>`;
+        const { data, error } = await supabaseClient.rpc("get_my_school_teachers");
+        if (error) throw error;
+        attendanceTeachers = data || [];
+        select.innerHTML += attendanceTeachers.map(t => `
+            <option value="${escapeHtml(t.id)}">${escapeHtml(teacherDisplayName(t))}</option>
+        `).join("");
+    }
+
+    async function loadAttendanceStudentsAndExisting() {
+        const classId = document.getElementById("attendanceClass").value;
+        const date = document.getElementById("attendanceDate").value;
+        const body = document.getElementById("attendanceTableBody");
+
+        attendanceStudents = [];
+        attendanceRows = {};
+        renderAttendanceTable();
+
+        if (!classId || !date) return;
+
+        body.innerHTML = `<tr><td colspan="4"><div class="empty-state">در حال دریافت دانش‌آموزان...</div></td></tr>`;
+
+        const [{ data: students, error: studentsError }, { data: history, error: historyError }] = await Promise.all([
+            supabaseClient.rpc("get_class_students_for_attendance", { p_class_id: classId }),
+            supabaseClient.rpc("get_attendance_history", {
+                p_class_id: classId,
+                p_from_date: date,
+                p_to_date: date
+            })
+        ]);
+
+        if (studentsError) throw studentsError;
+        if (historyError) throw historyError;
+
+        attendanceStudents = students || [];
+        attendanceStudents.forEach(student => {
+            attendanceRows[student.student_id] = { status: "present", note: "" };
+        });
+
+        (history || []).forEach(record => {
+            if (attendanceRows[record.student_id]) {
+                attendanceRows[record.student_id] = {
+                    status: record.status || "present",
+                    note: record.note || ""
+                };
+                if (record.session_number) {
+                    document.getElementById("attendanceSessionNumber").value = record.session_number;
+                }
+                if (record.session_title) {
+                    document.getElementById("attendanceTitle").value = record.session_title;
+                }
+                if (record.teacher_id) {
+                    document.getElementById("attendanceTeacher").value = record.teacher_id;
+                }
+            }
+        });
+
+        renderAttendanceTable();
+    }
+
+    async function loadAttendanceHistory() {
+        const classId = document.getElementById("attendanceClass").value;
+        const fromDate = document.getElementById("attendanceHistoryFrom").value || null;
+        const toDate = document.getElementById("attendanceHistoryTo").value || null;
+        const body = document.getElementById("attendanceHistoryBody");
+
+        if (!classId) {
+            body.innerHTML = `<tr><td colspan="6"><div class="empty-state">ابتدا کلاس را انتخاب کنید.</div></td></tr>`;
+            return;
+        }
+
+        if (fromDate && toDate && fromDate > toDate) {
+            showMessage(document.getElementById("attendancePageMessage"), "بازه تاریخ معتبر نیست: تاریخ شروع نباید بعد از تاریخ پایان باشد.", "error");
+            return;
+        }
+
+        body.innerHTML = `<tr><td colspan="6"><div class="empty-state">در حال دریافت سوابق...</div></td></tr>`;
+
+        const { data, error } = await supabaseClient.rpc("get_attendance_history", {
+            p_class_id: classId,
+            p_from_date: fromDate,
+            p_to_date: toDate
+        });
+
+        if (error) throw error;
+
+        if (!data?.length) {
+            body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📚</div><div>برای این بازه سابقه‌ای ثبت نشده است.</div></div></td></tr>`;
+            return;
+        }
+
+        body.innerHTML = data.map(record => `
+            <tr>
+                <td>${escapeHtml(attendanceDateText(record.session_date))}</td>
+                <td>${escapeHtml(record.session_number ?? "—")}${record.session_title ? `<div class="attendance-student-meta">${escapeHtml(record.session_title)}</div>` : ""}</td>
+                <td><div class="attendance-student">${escapeHtml(record.student_first_name)} ${escapeHtml(record.student_last_name)}</div><div class="attendance-student-meta">${escapeHtml(record.student_code || "—")}</div></td>
+                <td><span class="attendance-history-status">${escapeHtml(attendanceStatusText(record.status))}</span></td>
+                <td>${escapeHtml(record.note || "—")}</td>
+                <td>${escapeHtml([record.teacher_first_name, record.teacher_last_name].filter(Boolean).join(" ") || "—")}</td>
+            </tr>
+        `).join("");
+    }
+
+    async function saveAttendance() {
+        const classId = document.getElementById("attendanceClass").value;
+        const date = document.getElementById("attendanceDate").value;
+        const sessionNumberRaw = document.getElementById("attendanceSessionNumber").value;
+        const sessionNumber = sessionNumberRaw ? Number(sessionNumberRaw) : null;
+        const title = document.getElementById("attendanceTitle").value.trim() || null;
+        const teacherId = document.getElementById("attendanceTeacher").value || null;
+        const button = document.getElementById("saveAttendanceButton");
+
+        hideMessage(document.getElementById("attendancePageMessage"));
+
+        if (!classId) {
+            showMessage(document.getElementById("attendancePageMessage"), "ابتدا کلاس را انتخاب کنید.", "error");
+            return;
+        }
+        if (!date) {
+            showMessage(document.getElementById("attendancePageMessage"), "تاریخ جلسه را وارد کنید.", "error");
+            return;
+        }
+        if (sessionNumber !== null && (!Number.isInteger(sessionNumber) || sessionNumber < 1)) {
+            showMessage(document.getElementById("attendancePageMessage"), "شماره جلسه باید یک عدد صحیح مثبت باشد.", "error");
+            return;
+        }
+        if (!attendanceStudents.length) {
+            showMessage(document.getElementById("attendancePageMessage"), "این کلاس دانش‌آموزی برای ثبت حضور و غیاب ندارد.", "error");
+            return;
+        }
+
+        const records = attendanceStudents.map(student => ({
+            student_id: student.student_id,
+            status: attendanceRows[student.student_id]?.status || "present",
+            note: attendanceRows[student.student_id]?.note || null
+        }));
+
+        button.disabled = true;
+        button.textContent = "در حال ثبت...";
+
+        try {
+            const { error } = await supabaseClient.rpc("save_attendance_session", {
+                p_class_id: classId,
+                p_session_date: date,
+                p_session_number: sessionNumber,
+                p_title: title,
+                p_teacher_id: teacherId,
+                p_records: records
+            });
+
+            if (error) throw error;
+
+            showMessage(document.getElementById("attendancePageMessage"), "حضور و غیاب با موفقیت ثبت شد.", "success");
+            await loadAttendanceHistory();
+        } catch (error) {
+            console.error("save_attendance_session:", error);
+            showMessage(document.getElementById("attendancePageMessage"), "ثبت حضور و غیاب انجام نشد: " + error.message, "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = "💾 ثبت حضور و غیاب";
+        }
+    }
+
+    async function loadAttendanceModule() {
+        if (!attendanceInitialized) {
+            document.getElementById("attendanceDate").value = todayISO();
+            document.getElementById("attendanceHistoryTo").value = todayISO();
+            const d = new Date();
+            d.setDate(d.getDate() - 30);
+            const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+            document.getElementById("attendanceHistoryFrom").value = local.toISOString().slice(0, 10);
+
+            document.getElementById("attendanceClass").addEventListener("change", async function() {
+                hideMessage(document.getElementById("attendancePageMessage"));
+                try {
+                    await loadAttendanceStudentsAndExisting();
+                    await loadAttendanceHistory();
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("attendancePageMessage"), "دریافت اطلاعات حضور و غیاب انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("attendanceDate").addEventListener("change", async function() {
+                try {
+                    await loadAttendanceStudentsAndExisting();
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("attendancePageMessage"), "دریافت اطلاعات جلسه انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("loadAttendanceHistoryButton").addEventListener("click", async function() {
+                try {
+                    await loadAttendanceHistory();
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("attendancePageMessage"), "دریافت سوابق انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("refreshAttendanceButton").addEventListener("click", async function() {
+                this.disabled = true;
+                try {
+                    await loadAttendanceClasses();
+                    await loadAttendanceTeachers();
+                    await loadAttendanceStudentsAndExisting();
+                    await loadAttendanceHistory();
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("attendancePageMessage"), "بروزرسانی حضور و غیاب انجام نشد: " + error.message, "error");
+                } finally {
+                    this.disabled = false;
+                }
+            });
+
+            document.getElementById("markAllPresentButton").addEventListener("click", function() {
+                attendanceStudents.forEach(student => {
+                    if (!attendanceRows[student.student_id]) attendanceRows[student.student_id] = {status:"present",note:""};
+                    attendanceRows[student.student_id].status = "present";
+                });
+                renderAttendanceTable();
+            });
+
+            document.getElementById("saveAttendanceButton").addEventListener("click", saveAttendance);
+            attendanceInitialized = true;
+        }
+
+        await loadAttendanceClasses();
+        await loadAttendanceTeachers();
+        if (document.getElementById("attendanceClass").value) {
+            await loadAttendanceStudentsAndExisting();
+            await loadAttendanceHistory();
+        }
+    }
 
 
     /* =========================================================
