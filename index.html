@@ -246,6 +246,58 @@
             white-space: nowrap;
         }
 
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+        }
+        .notification-btn:hover { background: #f8fafc; }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            min-width: 19px;
+            height: 19px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
+        .notification-list { display:flex; flex-direction:column; gap:10px; }
+        .notification-item {
+            border:1px solid #e2e8f0;
+            border-radius:14px;
+            padding:14px;
+            background:#fff;
+            cursor:pointer;
+            transition:.15s;
+        }
+        .notification-item:hover { background:#f8fafc; }
+        .notification-item.unread { border-right:4px solid #4f46e5; background:#f8faff; }
+        .notification-item-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .notification-item-title { font-weight:800; color:#0f172a; }
+        .notification-item-time { color:#64748b; font-size:11px; white-space:nowrap; }
+        .notification-item-body { margin-top:7px; color:#475569; line-height:1.8; font-size:13px; }
+        .notification-item-meta { margin-top:8px; color:#94a3b8; font-size:10px; }
+        .notification-summary { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+        .notification-summary .summary-badge { background:#eef2ff; color:#4338ca; padding:7px 10px; border-radius:9px; font-size:11px; font-weight:700; }
+        @media (max-width:760px) { .notification-btn { width:36px; height:36px; } }
+
         .user-area {
             display: flex;
             align-items: center;
@@ -1158,6 +1210,11 @@
                     <div id="dashboardUserRole" class="user-role">مدیر</div>
                 </div>
 
+                <button id="notificationButton" class="notification-btn" type="button" title="اعلان‌ها" aria-label="اعلان‌ها">
+                    🔔
+                    <span id="notificationBadge" class="notification-badge">0</span>
+                </button>
+
                 <div id="dashboardAvatar" class="avatar">م</div>
 
                 <button id="dashboardLogoutButton" class="logout-btn">
@@ -1229,6 +1286,12 @@
                 </button>
 
                 <div class="nav-title">ارتباطات</div>
+
+                <button class="nav-item" data-module="notifications">
+                    <span class="nav-icon">🔔</span>
+                    اعلان‌ها
+                    <span id="sidebarNotificationBadge" class="notification-badge" style="position:static; margin-right:5px; display:none;">0</span>
+                </button>
 
                 <button class="nav-item" data-module="chat">
                     <span class="nav-icon">💬</span>
@@ -1873,6 +1936,31 @@
                     </section>
 
 
+                    <!-- NOTIFICATIONS -->
+                    <section id="notificationsPage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>🔔 اعلان‌ها</h2>
+                                <p>غیبت، تأخیر، نمرات و اطلاع‌رسانی‌های حساب کاربری شما</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshNotificationsButton" class="small-btn">🔄 بروزرسانی</button>
+                                <button id="markAllNotificationsReadButton" class="small-btn success">✓ خواندن همه</button>
+                            </div>
+                        </div>
+                        <div id="notificationsPageMessage" class="message"></div>
+                        <div class="table-card">
+                            <div class="notification-summary">
+                                <span id="notificationsTotalBadge" class="summary-badge">همه: ۰</span>
+                                <span id="notificationsUnreadBadge" class="summary-badge">خوانده‌نشده: ۰</span>
+                            </div>
+                            <div id="notificationsList" class="notification-list">
+                                <div class="empty-state">در حال دریافت اعلان‌ها...</div>
+                            </div>
+                        </div>
+                    </section>
+
+
                     <!-- OTHER MODULES -->
                     <section id="otherModulePage" class="module-page">
 
@@ -2334,6 +2422,7 @@
             "خوش آمدید " + fullName + " 👋";
 
         openDashboard();
+        initNotifications().catch(console.error);
 
     }
 
@@ -2463,6 +2552,11 @@
             icon: "⚠️"
         },
 
+        notifications: {
+            title: "اعلان‌ها",
+            icon: "🔔"
+        },
+
         chat: {
             title: "پیام‌ها",
             icon: "💬"
@@ -2505,6 +2599,9 @@
         const disciplinePage =
             document.getElementById("disciplinePage");
 
+        const notificationsPage =
+            document.getElementById("notificationsPage");
+
         const otherPage =
             document.getElementById("otherModulePage");
 
@@ -2517,6 +2614,7 @@
         attendancePage.classList.remove("active");
         gradesPage.classList.remove("active");
         disciplinePage.classList.remove("active");
+        notificationsPage.classList.remove("active");
         otherPage.classList.remove("active");
 
         document
@@ -2603,6 +2701,15 @@
             loadDisciplineModule().catch(function(error) {
                 console.error("دریافت انضباط انجام نشد:", error);
                 showMessage(document.getElementById("disciplinePageMessage"), "دریافت اطلاعات انضباط انجام نشد: " + error.message, "error");
+            });
+            return;
+        }
+
+        if (moduleName === "notifications") {
+            notificationsPage.classList.add("active");
+            loadNotificationsPage().catch(function(error) {
+                console.error("دریافت اعلان‌ها انجام نشد:", error);
+                showMessage(document.getElementById("notificationsPageMessage"), "دریافت اعلان‌ها انجام نشد: " + error.message, "error");
             });
             return;
         }
@@ -5812,6 +5919,125 @@
             }
         );
 
+
+    /* =========================================================
+       NOTIFICATIONS
+       ========================================================= */
+
+    let notificationsInitialized = false;
+    let notificationRefreshTimer = null;
+
+    function notificationTypeLabel(type) {
+        const map = {
+            attendance: "حضور و غیاب",
+            grade: "نمرات",
+            discipline: "انضباط",
+            general: "اطلاع‌رسانی"
+        };
+        return map[type] || type || "اعلان";
+    }
+
+    function formatNotificationDate(value) {
+        if (!value) return "";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return value;
+        return d.toLocaleString("fa-IR", { dateStyle: "short", timeStyle: "short" });
+    }
+
+    function renderNotificationBadges(unread) {
+        const count = Number(unread || 0);
+        const badge = document.getElementById("notificationBadge");
+        const side = document.getElementById("sidebarNotificationBadge");
+        if (badge) {
+            badge.textContent = count > 99 ? "99+" : String(count);
+            badge.style.display = count > 0 ? "flex" : "none";
+        }
+        if (side) {
+            side.textContent = count > 99 ? "99+" : String(count);
+            side.style.display = count > 0 ? "inline-flex" : "none";
+        }
+        const unreadSummary = document.getElementById("notificationsUnreadBadge");
+        if (unreadSummary) unreadSummary.textContent = "خوانده‌نشده: " + count.toLocaleString("fa-IR");
+    }
+
+    async function loadNotificationUnreadCount() {
+        const { data, error } = await supabaseClient.rpc("get_my_unread_notification_count");
+        if (error) throw error;
+        renderNotificationBadges(data || 0);
+        return Number(data || 0);
+    }
+
+    async function loadNotificationsPage() {
+        const list = document.getElementById("notificationsList");
+        list.innerHTML = '<div class="empty-state">در حال دریافت اعلان‌ها...</div>';
+
+        const { data, error } = await supabaseClient.rpc("get_my_notifications", {
+            p_limit: 100,
+            p_unread_only: false
+        });
+        if (error) throw error;
+
+        const rows = data || [];
+        const unread = rows.filter(x => !x.is_read).length;
+        document.getElementById("notificationsTotalBadge").textContent = "همه: " + rows.length.toLocaleString("fa-IR");
+        renderNotificationBadges(unread);
+
+        if (!rows.length) {
+            list.innerHTML = '<div class="empty-state"><div class="icon">🔔</div><div>اعلانی برای نمایش وجود ندارد.</div></div>';
+            return;
+        }
+
+        list.innerHTML = rows.map(item => `
+            <div class="notification-item ${item.is_read ? "" : "unread"}" data-notification-id="${escapeHtml(item.id)}">
+                <div class="notification-item-head">
+                    <div class="notification-item-title">${escapeHtml(item.title || "اعلان")}</div>
+                    <div class="notification-item-time">${escapeHtml(formatNotificationDate(item.created_at))}</div>
+                </div>
+                <div class="notification-item-body">${escapeHtml(item.body || "")}</div>
+                <div class="notification-item-meta">${escapeHtml(notificationTypeLabel(item.notification_type))}${item.is_read ? " • خوانده‌شده" : " • جدید"}</div>
+            </div>
+        `).join("");
+
+        list.querySelectorAll(".notification-item").forEach(item => {
+            item.addEventListener("click", async function() {
+                const id = this.dataset.notificationId;
+                try {
+                    const { error } = await supabaseClient.rpc("mark_notification_read", { p_notification_id: id });
+                    if (error) throw error;
+                    await loadNotificationsPage();
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("notificationsPageMessage"), "خواندن اعلان انجام نشد: " + error.message, "error");
+                }
+            });
+        });
+    }
+
+    async function initNotifications() {
+        if (!notificationsInitialized) {
+            document.getElementById("notificationButton").addEventListener("click", function() {
+                openModule("notifications");
+            });
+            document.getElementById("refreshNotificationsButton").addEventListener("click", loadNotificationsPage);
+            document.getElementById("markAllNotificationsReadButton").addEventListener("click", async function() {
+                try {
+                    await supabaseClient.rpc("mark_all_notifications_read");
+                    await loadNotificationsPage();
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("notificationsPageMessage"), "خواندن اعلان‌ها انجام نشد: " + error.message, "error");
+                }
+            });
+            notificationsInitialized = true;
+        }
+
+        await loadNotificationUnreadCount();
+        if (!notificationRefreshTimer) {
+            notificationRefreshTimer = setInterval(() => {
+                loadNotificationUnreadCount().catch(console.error);
+            }, 30000);
+        }
+    }
 
     /* =========================================================
        INITIAL SESSION
