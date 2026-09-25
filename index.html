@@ -509,9 +509,11 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
     // APP URL
     // =========================================================
 
+    // آدرس اختصاصی صفحه بازیابی رمز
     const APP_URL =
         window.location.origin +
-        window.location.pathname;
+        window.location.pathname +
+        "?reset-password=1";
 
 
     // =========================================================
@@ -908,18 +910,31 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
                 "success"
             );
 
-
             document.getElementById("newPassword")
                 .value = "";
 
             document.getElementById("confirmPassword")
                 .value = "";
 
+            // پایان Session بازیابی و بازگشت به صفحه ورود
+            await supabaseClient.auth.signOut();
 
             setTimeout(
-                async function() {
+                function() {
 
-                    await loadAccountInfo();
+                    window.history.replaceState(
+                        {},
+                        document.title,
+                        window.location.pathname
+                    );
+
+                    showOnly(loginCard);
+
+                    showMessage(
+                        document.getElementById("loginMessage"),
+                        "رمز عبور با موفقیت تغییر کرد. اکنون با رمز جدید وارد شوید.",
+                        "success"
+                    );
 
                 },
                 1200
@@ -970,15 +985,32 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
 
     async function initializeApp() {
 
+        // اگر کاربر از لینک بازیابی رمز وارد شده باشد،
+        // فرم تغییر رمز را نمایش بده؛ حتی اگر قبلاً Session داشته باشد.
+        const isResetPasswordPage =
+            new URLSearchParams(window.location.search)
+                .get("reset-password") === "1";
+
+        if (isResetPasswordPage) {
+
+            showOnly(updatePasswordCard);
+
+            showMessage(
+                document.getElementById("updateMessage"),
+                "لطفاً رمز جدید خود را وارد کنید.",
+                "info"
+            );
+
+            return;
+        }
+
         const {
             data
         } =
             await supabaseClient.auth.getSession();
 
-
         const session =
             data?.session;
-
 
         /*
          * اگر کاربر قبلاً وارد شده باشد،
