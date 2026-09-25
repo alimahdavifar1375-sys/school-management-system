@@ -634,6 +634,194 @@
             font-size: 12px;
         }
 
+
+        /* =====================================================
+           STUDENT MODAL
+           ===================================================== */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(15, 23, 42, .55);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            width: min(760px, 100%);
+            max-height: calc(100vh - 36px);
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(15, 23, 42, .25);
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 20px;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 9px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 20px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .student-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .student-form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+        .student-form-grid .form-group {
+            margin-bottom: 0;
+        }
+
+        .student-form-grid select,
+        .student-form-grid textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 11px;
+            background: #fff;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .student-form-grid select {
+            height: 46px;
+            padding: 0 12px;
+        }
+
+        .student-form-grid textarea {
+            min-height: 90px;
+            padding: 12px;
+            resize: vertical;
+        }
+
+        .student-form-grid select:focus,
+        .student-form-grid textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-start;
+            gap: 9px;
+            padding: 16px 20px 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .modal-footer .small-btn {
+            min-width: 120px;
+        }
+
+        .small-btn.danger {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .small-btn.success {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .row-action {
+            border: 0;
+            border-radius: 7px;
+            padding: 6px 9px;
+            font-family: inherit;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .row-action.edit {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .row-action.disable {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .row-action.enable {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        @media (max-width: 600px) {
+            .modal-overlay {
+                padding: 8px;
+                align-items: flex-end;
+            }
+
+            .modal-card {
+                max-height: calc(100vh - 16px);
+                border-radius: 18px 18px 0 0;
+            }
+
+            .student-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .student-form-grid .full {
+                grid-column: auto;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .modal-footer .small-btn {
+                width: 100%;
+            }
+        }
+
         /* =====================================================
            RESPONSIVE
            ===================================================== */
@@ -1164,13 +1352,14 @@
                                             <th>کد ملی</th>
                                             <th>موبایل</th>
                                             <th>وضعیت</th>
+                                            <th>عملیات</th>
                                         </tr>
                                     </thead>
 
                                     <tbody id="studentsTableBody">
 
                                         <tr>
-                                            <td colspan="5">
+                                            <td colspan="6">
                                                 <div class="empty-state">
                                                     در حال دریافت اطلاعات...
                                                 </div>
@@ -1215,6 +1404,150 @@
         </div>
 
     </section>
+
+
+    <!-- =====================================================
+         STUDENT ADD / EDIT MODAL
+         ===================================================== -->
+    <div id="studentModal" class="modal-overlay">
+
+        <div class="modal-card">
+
+            <div class="modal-header">
+                <h3 id="studentModalTitle">➕ افزودن دانش‌آموز</h3>
+
+                <button
+                    id="closeStudentModal"
+                    class="modal-close"
+                    type="button"
+                    aria-label="بستن">
+                    ×
+                </button>
+            </div>
+
+            <form id="studentForm">
+
+                <div class="modal-body">
+
+                    <div id="studentFormMessage" class="message"></div>
+
+                    <div class="student-form-grid">
+
+                        <div class="form-group">
+                            <label for="studentFirstName">
+                                نام <span class="required">*</span>
+                            </label>
+                            <input id="studentFirstName" type="text" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentLastName">
+                                نام خانوادگی <span class="required">*</span>
+                            </label>
+                            <input id="studentLastName" type="text" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentCode">
+                                کد دانش‌آموزی <span class="required">*</span>
+                            </label>
+                            <input id="studentCode" type="text" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentNumber">
+                                شماره دانش‌آموزی
+                            </label>
+                            <input id="studentNumber" type="text">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentBirthDate">
+                                تاریخ تولد
+                            </label>
+                            <input id="studentBirthDate" type="date">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentGender">
+                                جنسیت
+                            </label>
+                            <select id="studentGender">
+                                <option value="">انتخاب نشده</option>
+                                <option value="male">پسر</option>
+                                <option value="female">دختر</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentFatherName">
+                                نام پدر
+                            </label>
+                            <input id="studentFatherName" type="text">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentMotherName">
+                                نام مادر
+                            </label>
+                            <input id="studentMotherName" type="text">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentAdmissionDate">
+                                تاریخ پذیرش
+                            </label>
+                            <input id="studentAdmissionDate" type="date">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentEnrollmentDate">
+                                تاریخ ثبت‌نام
+                            </label>
+                            <input id="studentEnrollmentDate" type="date">
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="studentAddress">
+                                آدرس
+                            </label>
+                            <textarea id="studentAddress"></textarea>
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="studentNotes">
+                                توضیحات
+                            </label>
+                            <textarea id="studentNotes"></textarea>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        id="saveStudentButton"
+                        class="small-btn"
+                        type="submit">
+                        💾 ذخیره دانش‌آموز
+                    </button>
+
+                    <button
+                        id="cancelStudentButton"
+                        class="small-btn"
+                        type="button">
+                        انصراف
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 
 <script>
@@ -1597,6 +1930,163 @@
        ========================================================= */
 
     let allStudents = [];
+    let editingStudentId = null;
+
+
+    const studentModal =
+        document.getElementById("studentModal");
+
+    const studentForm =
+        document.getElementById("studentForm");
+
+
+    function openStudentModal(student = null) {
+
+        editingStudentId =
+            student ? student.id : null;
+
+        document.getElementById("studentModalTitle").textContent =
+            student
+                ? "✏️ ویرایش دانش‌آموز"
+                : "➕ افزودن دانش‌آموز";
+
+        document.getElementById("studentFirstName").value =
+            student?.first_name || "";
+
+        document.getElementById("studentLastName").value =
+            student?.last_name || "";
+
+        document.getElementById("studentCode").value =
+            student?.student_code || "";
+
+        document.getElementById("studentNumber").value =
+            student?.student_number || "";
+
+        document.getElementById("studentBirthDate").value =
+            student?.birth_date || "";
+
+        document.getElementById("studentGender").value =
+            student?.gender || "";
+
+        document.getElementById("studentFatherName").value =
+            student?.father_name || "";
+
+        document.getElementById("studentMotherName").value =
+            student?.mother_name || "";
+
+        document.getElementById("studentAdmissionDate").value =
+            student?.admission_date || "";
+
+        document.getElementById("studentEnrollmentDate").value =
+            student?.enrollment_date || "";
+
+        document.getElementById("studentAddress").value =
+            student?.address || "";
+
+        document.getElementById("studentNotes").value =
+            student?.notes || "";
+
+        hideMessage(
+            document.getElementById("studentFormMessage")
+        );
+
+        studentModal.classList.add("open");
+
+        setTimeout(function () {
+            document.getElementById("studentFirstName").focus();
+        }, 50);
+    }
+
+
+    function closeStudentModal() {
+
+        studentModal.classList.remove("open");
+
+        editingStudentId = null;
+
+        studentForm.reset();
+
+        hideMessage(
+            document.getElementById("studentFormMessage")
+        );
+    }
+
+
+    document
+        .getElementById("addStudentButton")
+        .addEventListener(
+            "click",
+            function () {
+                openStudentModal();
+            }
+        );
+
+
+    document
+        .getElementById("closeStudentModal")
+        .addEventListener(
+            "click",
+            closeStudentModal
+        );
+
+
+    document
+        .getElementById("cancelStudentButton")
+        .addEventListener(
+            "click",
+            closeStudentModal
+        );
+
+
+    studentModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (event.target === studentModal) {
+                closeStudentModal();
+            }
+
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                studentModal.classList.contains("open")
+            ) {
+                closeStudentModal();
+            }
+
+        }
+    );
+
+
+    async function getCurrentSchoolId() {
+
+        const { data, error } =
+            await supabaseClient.rpc(
+                "get_my_account_info"
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        const schoolId =
+            data?.school_id;
+
+        if (!schoolId) {
+            throw new Error(
+                "مدرسه برای حساب کاربری مشخص نشده است."
+            );
+        }
+
+        return schoolId;
+    }
 
 
     async function loadStudents() {
@@ -1609,7 +2099,7 @@
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="6">
                     <div class="empty-state">
                         در حال دریافت دانش‌آموزان...
                     </div>
@@ -1624,11 +2114,34 @@
         );
 
 
-        const { data: students, error } =
+        const {
+            data: students,
+            error
+        } =
             await supabaseClient
                 .from("students")
-                .select("id, user_id, school_id")
-                .order("id", { ascending: false });
+                .select(`
+                    id,
+                    user_id,
+                    school_id,
+                    student_code,
+                    first_name,
+                    last_name,
+                    birth_date,
+                    gender,
+                    admission_date,
+                    created_at,
+                    student_number,
+                    father_name,
+                    mother_name,
+                    address,
+                    enrollment_date,
+                    notes
+                `)
+                .order(
+                    "created_at",
+                    { ascending: false }
+                );
 
 
         if (error) {
@@ -1637,7 +2150,7 @@
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         <div class="empty-state">
                             دریافت اطلاعات با خطا مواجه شد.
                         </div>
@@ -1649,27 +2162,23 @@
 
             showMessage(
                 document.getElementById("studentsPageMessage"),
-                "دریافت لیست دانش‌آموزان انجام نشد. اگر هنوز دانش‌آموزی ثبت نشده باشد، این پیام باید بعداً با فرم ثبت مدیریت شود.",
+                "دریافت لیست دانش‌آموزان انجام نشد: " +
+                error.message,
                 "error"
             );
 
             return;
-
         }
 
 
-        allStudents = students || [];
+        allStudents =
+            students || [];
 
 
-        if (!allStudents.length) {
-
-            renderStudents([]);
-
-            return;
-
-        }
-
-
+        /*
+         * اگر user_id وجود داشته باشد، وضعیت حساب کاربری را
+         * از profiles می‌خوانیم.
+         */
         const userIds =
             allStudents
                 .map(student => student.user_id)
@@ -1681,57 +2190,53 @@
 
         if (userIds.length) {
 
-            const { data: profileData, error: profileError } =
+            const {
+                data: profileData,
+                error: profileError
+            } =
                 await supabaseClient
                     .from("profiles")
                     .select(
-                        "id, first_name, last_name, mobile, national_code, is_active"
+                        "id, is_active, mobile, national_code"
                     )
-                    .in("id", userIds);
+                    .in(
+                        "id",
+                        userIds
+                    );
 
 
-            if (profileError) {
-                console.error(profileError);
-            } else {
+            if (!profileError) {
                 profiles = profileData || [];
             }
-
         }
 
 
         const profileMap = {};
 
-
-        profiles.forEach(function(profile) {
+        profiles.forEach(function (profile) {
             profileMap[profile.id] = profile;
         });
 
 
         allStudents =
-            allStudents.map(function(student) {
+            allStudents.map(function (student) {
 
                 const profile =
-                    profileMap[student.user_id] || {};
+                    profileMap[student.user_id] || null;
 
                 return {
-
                     ...student,
 
-                    first_name:
-                        profile.first_name || "—",
-
-                    last_name:
-                        profile.last_name || "",
+                    account_active:
+                        profile
+                            ? profile.is_active !== false
+                            : null,
 
                     mobile:
-                        profile.mobile || "—",
+                        profile?.mobile || "",
 
                     national_code:
-                        profile.national_code || "—",
-
-                    is_active:
-                        profile.is_active !== false
-
+                        profile?.national_code || 
                 };
 
             });
@@ -1741,7 +2246,6 @@
 
         document.getElementById("studentStat").textContent =
             allStudents.length;
-
     }
 
 
@@ -1762,23 +2266,24 @@
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         <div class="empty-state">
                             <div class="icon">👨‍🎓</div>
-                            <div>هنوز دانش‌آموزی ثبت نشده یا نتیجه‌ای پیدا نشد.</div>
+                            <div>
+                                هنوز دانش‌آموزی ثبت نشده یا نتیجه‌ای پیدا نشد.
+                            </div>
                         </div>
                     </td>
                 </tr>
             `;
 
             return;
-
         }
 
 
         tableBody.innerHTML =
             students
-                .map(function(student, index) {
+                .map(function (student, index) {
 
                     const fullName =
                         (
@@ -1789,16 +2294,18 @@
                         "بدون نام";
 
 
-                    const statusClass =
-                        student.is_active
-                            ? "active"
-                            : "inactive";
+                    let statusClass = "active";
+                    let statusText = "ثبت شده";
 
+                    if (student.account_active === true) {
+                        statusClass = "active";
+                        statusText = "حساب فعال";
+                    }
 
-                    const statusText =
-                        student.is_active
-                            ? "فعال"
-                            : "غیرفعال";
+                    if (student.account_active === false) {
+                        statusClass = "inactive";
+                        statusText = "حساب غیرفعال";
+                    }
 
 
                     return `
@@ -1815,17 +2322,23 @@
                                 </div>
 
                                 <div class="student-id">
-                                    ${escapeHtml(student.user_id || "بدون حساب کاربری")}
+                                    کد: ${escapeHtml(
+                                        student.student_code || "—"
+                                    )}
                                 </div>
 
                             </td>
 
                             <td>
-                                ${escapeHtml(student.national_code)}
+                                ${escapeHtml(
+                                    student.national_code || "—"
+                                )}
                             </td>
 
                             <td>
-                                ${escapeHtml(student.mobile)}
+                                ${escapeHtml(
+                                    student.mobile || "—"
+                                )}
                             </td>
 
                             <td>
@@ -1834,11 +2347,157 @@
                                 </span>
                             </td>
 
+                            <td>
+
+                                <div class="student-actions">
+
+                                    <button
+                                        class="row-action edit"
+                                        type="button"
+                                        data-edit-student="${student.id}">
+                                        ویرایش
+                                    </button>
+
+                                    ${
+                                        student.account_active === false
+                                        ?
+                                        `<button
+                                            class="row-action enable"
+                                            type="button"
+                                            data-toggle-student="${student.id}">
+                                            فعال‌سازی
+                                        </button>`
+                                        :
+                                        student.user_id
+                                        ?
+                                        `<button
+                                            class="row-action disable"
+                                            type="button"
+                                            data-toggle-student="${student.id}">
+                                            غیرفعال
+                                        </button>`
+                                        :
+                                        ``
+                                    }
+
+                                </div>
+
+                            </td>
+
                         </tr>
                     `;
 
                 })
                 .join("");
+
+
+        tableBody
+            .querySelectorAll("[data-edit-student]")
+            .forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const id =
+                            button.getAttribute(
+                                "data-edit-student"
+                            );
+
+                        const student =
+                            allStudents.find(
+                                item =>
+                                    String(item.id) === String(id)
+                            );
+
+                        if (student) {
+                            openStudentModal(student);
+                        }
+
+                    }
+                );
+
+            });
+
+
+        tableBody
+            .querySelectorAll("[data-toggle-student]")
+            .forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    async function () {
+
+                        const id =
+                            button.getAttribute(
+                                "data-toggle-student"
+                            );
+
+                        const student =
+                            allStudents.find(
+                                item =>
+                                    String(item.id) === String(id)
+                            );
+
+                        if (!student || !student.user_id) {
+                            return;
+                        }
+
+
+                        const targetActive =
+                            student.account_active === false;
+
+
+                        const actionText =
+                            targetActive
+                                ? "فعال شود"
+                                : "غیرفعال شود";
+
+
+                        const confirmed =
+                            window.confirm(
+                                `آیا حساب این دانش‌آموز باید ${actionText}؟`
+                            );
+
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+
+                        const { error } =
+                            await supabaseClient
+                                .from("profiles")
+                                .update({
+                                    is_active: targetActive
+                                })
+                                .eq(
+                                    "id",
+                                    student.user_id
+                                );
+
+
+                        if (error) {
+
+                            showMessage(
+                                document.getElementById(
+                                    "studentsPageMessage"
+                                ),
+                                "تغییر وضعیت انجام نشد: " +
+                                error.message,
+                                "error"
+                            );
+
+                            return;
+                        }
+
+
+                        await loadStudents();
+
+                    }
+                );
+
+            });
 
     }
 
@@ -1858,17 +2517,20 @@
             renderStudents(allStudents);
 
             return;
-
         }
 
 
         const filtered =
-            allStudents.filter(function(student) {
+            allStudents.filter(function (student) {
 
                 const text =
                     [
                         student.first_name,
                         student.last_name,
+                        student.student_code,
+                        student.student_number,
+                        student.father_name,
+                        student.mother_name,
                         student.national_code,
                         student.mobile
                     ]
@@ -1882,7 +2544,6 @@
 
 
         renderStudents(filtered);
-
     }
 
 
@@ -1902,20 +2563,316 @@
         );
 
 
-    document
-        .getElementById("addStudentButton")
-        .addEventListener(
-            "click",
-            function() {
+    studentForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const firstName =
+                document
+                    .getElementById("studentFirstName")
+                    .value
+                    .trim();
+
+
+            const lastName =
+                document
+                    .getElementById("studentLastName")
+                    .value
+                    .trim();
+
+
+            const studentCode =
+                document
+                    .getElementById("studentCode")
+                    .value
+                    .trim();
+
+
+            const studentNumber =
+                document
+                    .getElementById("studentNumber")
+                    .value
+                    .trim();
+
+
+            if (!firstName || !lastName || !studentCode) {
 
                 showMessage(
-                    document.getElementById("studentsPageMessage"),
-                    "فرم افزودن دانش‌آموز را در مرحله بعد می‌سازیم.",
-                    "info"
+                    document.getElementById(
+                        "studentFormMessage"
+                    ),
+                    "نام، نام خانوادگی و کد دانش‌آموزی الزامی هستند.",
+                    "error"
                 );
 
+                return;
             }
-        );
+
+
+            const button =
+                document.getElementById(
+                    "saveStudentButton"
+                );
+
+
+            button.disabled = true;
+            button.textContent = "در حال ذخیره...";
+
+
+            hideMessage(
+                document.getElementById(
+                    "studentFormMessage"
+                )
+            );
+
+
+            try {
+
+                if (editingStudentId) {
+
+                    const updateData = {
+
+                        first_name: firstName,
+
+                        last_name: lastName,
+
+                        student_code: studentCode,
+
+                        student_number:
+                            studentNumber || null,
+
+                        birth_date:
+                            document
+                                .getElementById(
+                                    "studentBirthDate"
+                                )
+                                .value || null,
+
+                        gender:
+                            document
+                                .getElementById(
+                                    "studentGender"
+                                )
+                                .value || null,
+
+                        father_name:
+                            document
+                                .getElementById(
+                                    "studentFatherName"
+                                )
+                                .value
+                                .trim() || null,
+
+                        mother_name:
+                            document
+                                .getElementById(
+                                    "studentMotherName"
+                                )
+                                .value
+                                .trim() || null,
+
+                        admission_date:
+                            document
+                                .getElementById(
+                                    "studentAdmissionDate"
+                                )
+                                .value || null,
+
+                        enrollment_date:
+                            document
+                                .getElementById(
+                                    "studentEnrollmentDate"
+                                )
+                                .value || null,
+
+                        address:
+                            document
+                                .getElementById(
+                                    "studentAddress"
+                                )
+                                .value
+                                .trim() || null,
+
+                        notes:
+                            document
+                                .getElementById(
+                                    "studentNotes"
+                                )
+                                .value
+                                .trim() || null
+                    };
+
+
+                    const {
+                        error
+                    } =
+                        await supabaseClient
+                            .from("students")
+                            .update(updateData)
+                            .eq(
+                                "id",
+                                editingStudentId
+                            );
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    closeStudentModal();
+
+                    showMessage(
+                        document.getElementById(
+                            "studentsPageMessage"
+                        ),
+                        "اطلاعات دانش‌آموز با موفقیت ویرایش شد.",
+                        "success"
+                    );
+
+
+                    await loadStudents();
+
+                } else {
+
+                    const schoolId =
+                        await getCurrentSchoolId();
+
+
+                    const insertData = {
+
+                        school_id:
+                            schoolId,
+
+                        student_code:
+                            studentCode,
+
+                        first_name:
+                            firstName,
+
+                        last_name:
+                            lastName,
+
+                        birth_date:
+                            document
+                                .getElementById(
+                                    "studentBirthDate"
+                                )
+                                .value || null,
+
+                        gender:
+                            document
+                                .getElementById(
+                                    "studentGender"
+                                )
+                                .value || null,
+
+                        admission_date:
+                            document
+                                .getElementById(
+                                    "studentAdmissionDate"
+                                )
+                                .value || null,
+
+                        student_number:
+                            studentNumber || null,
+
+                        father_name:
+                            document
+                                .getElementById(
+                                    "studentFatherName"
+                                )
+                                .value
+                                .trim() || null,
+
+                        mother_name:
+                            document
+                                .getElementById(
+                                    "studentMotherName"
+                                )
+                                .value
+                                .trim() || null,
+
+                        address:
+                            document
+                                .getElementById(
+                                    "studentAddress"
+                                )
+                                .value
+                                .trim() || null,
+
+                        enrollment_date:
+                            document
+                                .getElementById(
+                                    "studentEnrollmentDate"
+                                )
+                                .value || null,
+
+                        notes:
+                            document
+                                .getElementById(
+                                    "studentNotes"
+                                )
+                                .value
+                                .trim() || null
+                    };
+
+
+                    const {
+                        error
+                    } =
+                        await supabaseClient
+                            .from("students")
+                            .insert(insertData);
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    closeStudentModal();
+
+                    showMessage(
+                        document.getElementById(
+                            "studentsPageMessage"
+                        ),
+                        "دانش‌آموز با موفقیت ثبت شد.",
+                        "success"
+                    );
+
+
+                    await loadStudents();
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    document.getElementById(
+                        "studentFormMessage"
+                    ),
+                    "ذخیره اطلاعات انجام نشد: " +
+                    error.message,
+                    "error"
+                );
+
+            } finally {
+
+                button.disabled = false;
+
+                button.textContent =
+                    "💾 ذخیره دانش‌آموز";
+
+            }
+
+        }
+    );
 
 
     /* =========================================================
