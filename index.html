@@ -807,6 +807,22 @@
             color: #047857;
         }
 
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .badge.success {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
         .required {
             color: #dc2626;
         }
@@ -990,7 +1006,7 @@
     
 
 /* GRADES MODULE */
-.grades-controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:15px;padding:16px;margin-bottom:15px}
+.grades-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:15px;padding:16px;margin-bottom:15px}
 .grades-controls .form-group{margin-bottom:0}
 .grades-controls .full{grid-column:1/-1}
 .grades-controls select,.grades-controls input,.grade-score-input,.grade-description-input{width:100%;height:44px;padding:0 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;outline:none;font-family:inherit;font-size:12px}
@@ -1193,6 +1209,11 @@
                 <button class="nav-item" data-module="classes">
                     <span class="nav-icon">🏫</span>
                     کلاس‌ها
+                </button>
+
+                <button class="nav-item" data-module="academic-years">
+                    <span class="nav-icon">📅</span>
+                    سال‌های تحصیلی
                 </button>
 
                 <button class="nav-item" data-module="subjects">
@@ -1510,6 +1531,28 @@
                     </section>
 
 
+                    <!-- ACADEMIC YEARS -->
+                    <section id="academicYearsPage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>📅 مدیریت سال‌های تحصیلی</h2>
+                                <p>ایجاد سال تحصیلی جدید و ساخت خودکار نوبت اول، نوبت دوم و کل سال</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshAcademicYearsButton" class="small-btn">🔄 بروزرسانی</button>
+                                <button id="addAcademicYearButton" class="small-btn success">➕ ایجاد سال تحصیلی</button>
+                            </div>
+                        </div>
+                        <div id="academicYearsPageMessage" class="message"></div>
+                        <div class="table-card"><div class="table-scroll">
+                            <table class="classes-table">
+                                <thead><tr><th>#</th><th>سال تحصیلی</th><th>شروع</th><th>پایان</th><th>وضعیت</th></tr></thead>
+                                <tbody id="academicYearsTableBody"><tr><td colspan="5"><div class="empty-state">در حال دریافت سال‌های تحصیلی...</div></td></tr></tbody>
+                            </table>
+                        </div></div>
+                    </section>
+
+
                     <!-- SUBJECTS -->
                     <section id="subjectsPage" class="module-page">
                         <div class="page-header">
@@ -1684,13 +1727,6 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="gradesPeriod">نوبت تحصیلی <span class="required">*</span></label>
-                                <select id="gradesPeriod" disabled>
-                                    <option value="">در حال دریافت نوبت‌ها...</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
                                 <label for="gradesType">نوع نمره <span class="required">*</span></label>
                                 <select id="gradesType" disabled>
                                     <option value="">ابتدا اطلاعات را دریافت کنید</option>
@@ -1851,6 +1887,39 @@
                 <div class="modal-footer">
                     <button id="cancelSubjectButton" type="button" class="small-btn">انصراف</button>
                     <button id="saveSubjectButton" type="submit" class="small-btn success">💾 ذخیره درس</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="academicYearModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>➕ ایجاد سال تحصیلی جدید</h3>
+                <button id="closeAcademicYearModal" class="modal-close" type="button">×</button>
+            </div>
+            <form id="academicYearForm">
+                <div class="modal-body">
+                    <div id="academicYearFormMessage" class="message"></div>
+                    <div class="class-form-grid">
+                        <div class="form-group full">
+                            <label for="academicYearTitle">عنوان سال تحصیلی <span class="required">*</span></label>
+                            <input id="academicYearTitle" type="text" required maxlength="50" placeholder="مثلاً ۱۴۰۶-۱۴۰۷">
+                        </div>
+                        <div class="form-group">
+                            <label for="academicYearStart">تاریخ شروع <span class="required">*</span></label>
+                            <input id="academicYearStart" type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="academicYearEnd">تاریخ پایان <span class="required">*</span></label>
+                            <input id="academicYearEnd" type="date" required>
+                        </div>
+                    </div>
+                    <div class="class-help" style="margin-top:10px;">با ذخیره، نوبت اول، نوبت دوم و «کل سال» به‌صورت خودکار ساخته می‌شوند.</div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelAcademicYearButton" type="button" class="small-btn">انصراف</button>
+                    <button id="saveAcademicYearButton" type="submit" class="small-btn success">💾 ایجاد سال تحصیلی</button>
                 </div>
             </form>
         </div>
@@ -2296,6 +2365,11 @@
             icon: "🏫"
         },
 
+        "academic-years": {
+            title: "سال‌های تحصیلی",
+            icon: "📅"
+        },
+
         subjects: {
             title: "دروس",
             icon: "📚"
@@ -2345,6 +2419,9 @@
         const classesPage =
             document.getElementById("classesPage");
 
+        const academicYearsPage =
+            document.getElementById("academicYearsPage");
+
         const subjectsPage =
             document.getElementById("subjectsPage");
 
@@ -2363,6 +2440,7 @@
         home.classList.add("hidden");
         studentsPage.classList.remove("active");
         classesPage.classList.remove("active");
+        academicYearsPage.classList.remove("active");
         subjectsPage.classList.remove("active");
         teachersPage.classList.remove("active");
         attendancePage.classList.remove("active");
@@ -2414,6 +2492,14 @@
         if (moduleName === "classes") {
             classesPage.classList.add("active");
             loadClasses();
+            return;
+        }
+
+        if (moduleName === "academic-years") {
+            academicYearsPage.classList.add("active");
+            loadAcademicYearsManagement().catch(function(error) {
+                showMessage(document.getElementById("academicYearsPageMessage"), "دریافت سال‌های تحصیلی انجام نشد: " + error.message, "error");
+            });
             return;
         }
 
@@ -2857,7 +2943,6 @@
     let gradesClasses = [];
     let gradesSubjects = [];
     let gradesTypes = [];
-    let gradesPeriods = [];
     let gradesStudents = [];
     let gradesExisting = [];
     let gradesInitialized = false;
@@ -3008,28 +3093,6 @@
         if (gradesClasses.length === 1) select.value = gradesClasses[0].id;
     }
 
-    async function loadGradesPeriods() {
-        const select = document.getElementById("gradesPeriod");
-        select.disabled = true;
-        select.innerHTML = `<option value="">در حال دریافت نوبت‌ها...</option>`;
-        const { data, error } = await supabaseClient.rpc("get_my_school_grade_periods");
-        if (error) throw error;
-        gradesPeriods = data || [];
-        setGradeSelect(
-            "gradesPeriod",
-            gradesPeriods,
-            gradesPeriods.length ? "انتخاب نوبت" : "هیچ نوبتی تعریف نشده است",
-            p => `${p.name} — ${p.start_date} تا ${p.end_date}`
-        );
-        if (gradesPeriods.length === 1) {
-            select.value = gradesPeriods[0].id;
-        } else if (gradesPeriods.length) {
-            const today = gradeTodayISO();
-            const current = gradesPeriods.find(p => today >= p.start_date && today <= p.end_date);
-            if (current) select.value = current.id;
-        }
-    }
-
     async function loadGradesTypes() {
         const select = document.getElementById("gradesType");
         select.disabled = true;
@@ -3085,9 +3148,8 @@
         const classId = document.getElementById("gradesClass").value;
         const subjectId = document.getElementById("gradesSubject").value || null;
         const typeId = document.getElementById("gradesType").value || null;
-        const periodId = document.getElementById("gradesPeriod").value || null;
         const date = document.getElementById("gradesDate").value || null;
-        if (!classId || !subjectId || !typeId || !periodId) {
+        if (!classId || !subjectId || !typeId) {
             gradesExisting = [];
             return;
         }
@@ -3095,8 +3157,8 @@
             p_class_id: classId,
             p_class_subject_id: subjectId,
             p_grade_type_id: typeId,
-            p_grade_date: date,
-            p_grade_period_id: periodId
+            p_from_date: date,
+            p_to_date: date
         });
         if (error) throw error;
         gradesExisting = data || [];
@@ -3106,11 +3168,10 @@
         const classId = document.getElementById("gradesClass").value;
         const subjectId = document.getElementById("gradesSubject").value || null;
         const typeId = document.getElementById("gradesType").value || null;
-        const periodId = document.getElementById("gradesPeriod").value || null;
         const date = document.getElementById("gradesDate").value || null;
         const body = document.getElementById("gradesHistoryBody");
-        if (!classId || !subjectId || !typeId || !periodId) {
-            body.innerHTML = `<tr><td colspan="8"><div class="empty-state">کلاس، درس، نوبت و نوع نمره را انتخاب کنید.</div></td></tr>`;
+        if (!classId || !subjectId || !typeId) {
+            body.innerHTML = `<tr><td colspan="8"><div class="empty-state">کلاس، درس و نوع نمره را انتخاب کنید.</div></td></tr>`;
             return;
         }
         body.innerHTML = `<tr><td colspan="8"><div class="empty-state">در حال دریافت نمرات...</div></td></tr>`;
@@ -3118,8 +3179,8 @@
             p_class_id: classId,
             p_class_subject_id: subjectId,
             p_grade_type_id: typeId,
-            p_grade_date: date,
-            p_grade_period_id: periodId
+            p_from_date: date,
+            p_to_date: date
         });
         if (error) throw error;
         renderGradesHistory(data || []);
@@ -3132,8 +3193,7 @@
         if (classId) await loadGradesStudents();
         const subjectId = document.getElementById("gradesSubject").value;
         const typeId = document.getElementById("gradesType").value;
-        const periodId = document.getElementById("gradesPeriod").value;
-        if (classId && subjectId && typeId && periodId) {
+        if (classId && subjectId && typeId) {
             await loadGradesExisting();
             renderGradesEntryTable();
             await loadGradesHistory();
@@ -3144,23 +3204,17 @@
         const classId = document.getElementById("gradesClass").value;
         const subjectId = document.getElementById("gradesSubject").value;
         const typeId = document.getElementById("gradesType").value;
-        const periodId = document.getElementById("gradesPeriod").value;
         const date = document.getElementById("gradesDate").value;
         const button = document.getElementById("saveAllGradesButton");
         const gradeType = getSelectedGradeType();
 
         hideMessage(document.getElementById("gradesPageMessage"));
-        if (!classId || !subjectId || !typeId || !periodId || !date) {
-            showMessage(document.getElementById("gradesPageMessage"), "کلاس، درس، نوبت، نوع نمره و تاریخ را کامل انتخاب کنید.", "error");
+        if (!classId || !subjectId || !typeId || !date) {
+            showMessage(document.getElementById("gradesPageMessage"), "کلاس، درس، نوع نمره و تاریخ را کامل انتخاب کنید.", "error");
             return;
         }
         if (!gradesStudents.length) {
             showMessage(document.getElementById("gradesPageMessage"), "این کلاس دانش‌آموزی برای ثبت نمره ندارد.", "error");
-            return;
-        }
-        const selectedPeriod = gradesPeriods.find(p => p.id === periodId);
-        if (!selectedPeriod || date < selectedPeriod.start_date || date > selectedPeriod.end_date) {
-            showMessage(document.getElementById("gradesPageMessage"), "تاریخ نمره خارج از بازه نوبت انتخاب‌شده است.", "error");
             return;
         }
         const maxScore = Number(gradeType?.max_score);
@@ -3196,8 +3250,7 @@
                     p_score: record.score,
                     p_max_score: Number.isFinite(maxScore) ? maxScore : null,
                     p_description: record.description,
-                    p_grade_date: date,
-                    p_grade_period_id: periodId
+                    p_grade_date: date
                 });
                 if (error) throw error;
                 successCount++;
@@ -3220,7 +3273,6 @@
     async function loadGradesModule() {
         if (!gradesInitialized) {
             document.getElementById("gradesDate").value = gradeTodayISO();
-            await loadGradesPeriods();
 
             document.getElementById("gradesClass").addEventListener("change", async function() {
                 try {
@@ -3228,7 +3280,7 @@
                     if (this.value) await loadGradesStudents();
                     const subjectId = document.getElementById("gradesSubject").value;
                     const typeId = document.getElementById("gradesType").value;
-                    if (this.value && subjectId && typeId && document.getElementById("gradesPeriod").value) {
+                    if (this.value && subjectId && typeId) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3242,7 +3294,7 @@
             document.getElementById("gradesSubject").addEventListener("change", async function() {
                 try {
                     await loadGradesStudents();
-                    if (this.value && document.getElementById("gradesType").value && document.getElementById("gradesPeriod").value) {
+                    if (this.value && document.getElementById("gradesType").value) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3250,21 +3302,6 @@
                 } catch (error) {
                     console.error(error);
                     showMessage(document.getElementById("gradesPageMessage"), "دریافت اطلاعات درس انجام نشد: " + error.message, "error");
-                }
-            });
-
-            document.getElementById("gradesPeriod").addEventListener("change", async function() {
-                try {
-                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value && this.value) {
-                        await loadGradesExisting();
-                        renderGradesEntryTable();
-                        await loadGradesHistory();
-                    } else {
-                        renderGradesEntryTable();
-                    }
-                } catch (error) {
-                    console.error(error);
-                    showMessage(document.getElementById("gradesPageMessage"), "دریافت نمرات این نوبت انجام نشد: " + error.message, "error");
                 }
             });
 
@@ -3285,7 +3322,7 @@
 
             document.getElementById("gradesDate").addEventListener("change", async function() {
                 try {
-                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value && document.getElementById("gradesPeriod").value) {
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3302,13 +3339,12 @@
                 this.disabled = true;
                 try {
                     await loadGradesClasses();
-                    await loadGradesPeriods();
                     await loadGradesTypes();
                     if (document.getElementById("gradesClass").value) {
                         await loadGradesSubjects();
                         if (document.getElementById("gradesSubject").value) await loadGradesStudents();
                     }
-                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value && document.getElementById("gradesPeriod").value) {
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3829,6 +3865,111 @@
                 .includes(q)
         ));
     });
+
+    /* =========================================================
+       ACADEMIC YEARS MANAGEMENT
+       ========================================================= */
+
+    const academicYearModal = document.getElementById("academicYearModal");
+    const academicYearForm = document.getElementById("academicYearForm");
+
+    function closeAcademicYearModal() {
+        academicYearModal.classList.remove("open");
+        academicYearForm.reset();
+        hideMessage(document.getElementById("academicYearFormMessage"));
+    }
+
+    function openAcademicYearModal() {
+        hideMessage(document.getElementById("academicYearFormMessage"));
+        academicYearModal.classList.add("open");
+        setTimeout(() => document.getElementById("academicYearTitle").focus(), 50);
+    }
+
+    async function loadAcademicYearsManagement() {
+        const body = document.getElementById("academicYearsTableBody");
+        const message = document.getElementById("academicYearsPageMessage");
+        hideMessage(message);
+        body.innerHTML = `<tr><td colspan="5"><div class="empty-state">در حال دریافت سال‌های تحصیلی...</div></td></tr>`;
+
+        const { data, error } = await supabaseClient
+            .from("academic_years")
+            .select("id,title,start_date,end_date,is_active,created_at")
+            .order("start_date", { ascending: false, nullsFirst: false })
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || !data.length) {
+            body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">📅</div><div>هنوز سال تحصیلی ثبت نشده است.</div></div></td></tr>`;
+            return;
+        }
+
+        body.innerHTML = data.map((y, i) => {
+            const status = y.is_active
+                ? `<span class="badge success">فعال</span>`
+                : `<span class="badge">قبلی</span>`;
+            return `<tr>
+                <td>${i + 1}</td>
+                <td><strong>${escapeHtml(y.title || "—")}</strong></td>
+                <td>${escapeHtml(y.start_date || "—")}</td>
+                <td>${escapeHtml(y.end_date || "—")}</td>
+                <td>${status}</td>
+            </tr>`;
+        }).join("");
+    }
+
+    document.getElementById("addAcademicYearButton").addEventListener("click", openAcademicYearModal);
+    document.getElementById("refreshAcademicYearsButton").addEventListener("click", () => {
+        loadAcademicYearsManagement().catch(error =>
+            showMessage(document.getElementById("academicYearsPageMessage"), "بروزرسانی انجام نشد: " + error.message, "error")
+        );
+    });
+    document.getElementById("closeAcademicYearModal").addEventListener("click", closeAcademicYearModal);
+    document.getElementById("cancelAcademicYearButton").addEventListener("click", closeAcademicYearModal);
+    academicYearModal.addEventListener("click", e => {
+        if (e.target === academicYearModal) closeAcademicYearModal();
+    });
+
+    academicYearForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const button = document.getElementById("saveAcademicYearButton");
+        const formMessage = document.getElementById("academicYearFormMessage");
+        const title = document.getElementById("academicYearTitle").value.trim();
+        const startDate = document.getElementById("academicYearStart").value;
+        const endDate = document.getElementById("academicYearEnd").value;
+
+        if (!title || !startDate || !endDate) {
+            showMessage(formMessage, "عنوان، تاریخ شروع و تاریخ پایان الزامی است.", "error");
+            return;
+        }
+        if (startDate >= endDate) {
+            showMessage(formMessage, "تاریخ شروع باید قبل از تاریخ پایان باشد.", "error");
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "در حال ایجاد...";
+        hideMessage(formMessage);
+
+        const { error } = await supabaseClient.rpc("create_academic_year", {
+            p_title: title,
+            p_start_date: startDate,
+            p_end_date: endDate
+        });
+
+        button.disabled = false;
+        button.textContent = "💾 ایجاد سال تحصیلی";
+
+        if (error) {
+            showMessage(formMessage, "ایجاد سال تحصیلی انجام نشد: " + error.message, "error");
+            return;
+        }
+
+        closeAcademicYearModal();
+        showMessage(document.getElementById("academicYearsPageMessage"), "سال تحصیلی با موفقیت ایجاد شد و نوبت‌ها نیز خودکار ساخته شدند.", "success");
+        await loadAcademicYearsManagement();
+    });
+
 
     /* =========================================================
        CLASSES MANAGEMENT
