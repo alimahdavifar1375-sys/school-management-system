@@ -988,6 +988,33 @@
             }
         }
     
+
+/* GRADES MODULE */
+.grades-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:15px;padding:16px;margin-bottom:15px}
+.grades-controls .form-group{margin-bottom:0}
+.grades-controls .full{grid-column:1/-1}
+.grades-controls select,.grades-controls input,.grade-score-input,.grade-description-input{width:100%;height:44px;padding:0 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;outline:none;font-family:inherit;font-size:12px}
+.grades-controls select:focus,.grades-controls input:focus,.grade-score-input:focus,.grade-description-input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.grades-table{min-width:920px}
+.grades-table .student-name{font-weight:800}
+.grade-score-input{width:105px;text-align:center;font-weight:800}
+.grade-description-input{min-width:190px}
+.grade-max{font-size:9px;color:#94a3b8;margin-top:3px}
+.grade-state{display:inline-flex;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:9px;font-weight:800}
+.grade-state.saved{background:#ecfdf5;color:#047857}
+.grade-state.missing{background:#fff7ed;color:#c2410c}
+.grade-actions{display:flex;gap:6px;flex-wrap:wrap}
+.grades-summary{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 15px}
+.grades-summary .summary-badge{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;color:#475569;font-size:10px;font-weight:800}
+.grades-history-table{min-width:1050px}
+.grade-score-cell{font-weight:900;font-size:13px}
+.grade-score-cell small{font-size:9px;color:#94a3b8;font-weight:600}
+.grade-delete-btn{border:0;border-radius:7px;padding:6px 9px;background:#fef2f2;color:#b91c1c;font-family:inherit;font-size:9px;font-weight:800}
+.grade-save-all{min-width:160px}
+.grade-help{font-size:10px;color:#64748b;line-height:1.9;margin-top:5px}
+@media(max-width:1000px){.grades-controls{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grades-controls{grid-template-columns:1fr}.grades-controls .full{grid-column:auto}.grade-score-input{width:95px}.grade-description-input{min-width:170px}}
+
 /* TEACHERS MODULE */
 .teachers-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:16px}
 .teacher-assignment-card{margin-top:18px}
@@ -1627,6 +1654,111 @@
                     </section>
 
 
+                    <!-- GRADES -->
+                    <section id="gradesPage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>📝 مدیریت نمرات</h2>
+                                <p>ثبت، ویرایش، مشاهده و مدیریت نمرات دانش‌آموزان</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshGradesButton" class="small-btn">🔄 بروزرسانی</button>
+                            </div>
+                        </div>
+
+                        <div id="gradesPageMessage" class="message"></div>
+
+                        <div class="grades-controls">
+                            <div class="form-group">
+                                <label for="gradesClass">کلاس <span class="required">*</span></label>
+                                <select id="gradesClass">
+                                    <option value="">در حال دریافت کلاس‌ها...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gradesSubject">درس <span class="required">*</span></label>
+                                <select id="gradesSubject" disabled>
+                                    <option value="">ابتدا کلاس را انتخاب کنید</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gradesType">نوع نمره <span class="required">*</span></label>
+                                <select id="gradesType" disabled>
+                                    <option value="">ابتدا اطلاعات را دریافت کنید</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gradesDate">تاریخ نمره <span class="required">*</span></label>
+                                <input id="gradesDate" type="date">
+                            </div>
+
+                            <div class="form-group full">
+                                <div class="grade-help">پس از انتخاب کلاس، درس و نوع نمره، دانش‌آموزان همان کلاس نمایش داده می‌شوند. نمره‌ها را وارد کنید و «ثبت همه نمرات» را بزنید.</div>
+                            </div>
+                        </div>
+
+                        <div class="grades-summary" id="gradesSummary">
+                            <span class="summary-badge">دانش‌آموزان: ۰</span>
+                            <span class="summary-badge">ثبت‌شده: ۰</span>
+                            <span class="summary-badge">بدون نمره: ۰</span>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-scroll">
+                                <table class="grades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>دانش‌آموز</th>
+                                            <th>نمره</th>
+                                            <th>توضیح</th>
+                                            <th>وضعیت</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gradesEntryBody">
+                                        <tr><td colspan="5"><div class="empty-state"><div class="icon">📝</div><div>ابتدا کلاس، درس و نوع نمره را انتخاب کنید.</div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="attendance-actions" style="margin-top:15px">
+                            <button id="saveAllGradesButton" class="small-btn success grade-save-all">💾 ثبت همه نمرات</button>
+                        </div>
+
+                        <div class="table-card" style="margin-top:18px">
+                            <div class="page-header" style="padding:15px 15px 0;margin-bottom:0">
+                                <div>
+                                    <h3 style="margin:0">📚 نمرات ثبت‌شده</h3>
+                                    <p>نمرات انتخاب‌شده برای کلاس، درس و نوع نمره نمایش داده می‌شوند.</p>
+                                </div>
+                            </div>
+                            <div class="table-scroll">
+                                <table class="grades-history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>تاریخ</th>
+                                            <th>دانش‌آموز</th>
+                                            <th>درس</th>
+                                            <th>نوع نمره</th>
+                                            <th>نمره</th>
+                                            <th>توضیح</th>
+                                            <th>ثبت‌کننده</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gradesHistoryBody">
+                                        <tr><td colspan="8"><div class="empty-state">برای مشاهده نمرات، فیلترها را انتخاب کنید.</div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+
                     <!-- OTHER MODULES -->
                     <section id="otherModulePage" class="module-page">
 
@@ -1989,6 +2121,8 @@
        ACCOUNT / DASHBOARD
        ========================================================= */
 
+    let currentUserRoles = [];
+
     async function loadAccountInfo() {
 
         const { data, error } =
@@ -2023,6 +2157,10 @@
 
         const roles =
             data?.roles || [];
+
+        currentUserRoles = roles
+            .map(item => item.role || "")
+            .filter(Boolean);
 
         const roleNames =
             roles
@@ -2209,6 +2347,9 @@
         const attendancePage =
             document.getElementById("attendancePage");
 
+        const gradesPage =
+            document.getElementById("gradesPage");
+
         const otherPage =
             document.getElementById("otherModulePage");
 
@@ -2218,6 +2359,7 @@
         subjectsPage.classList.remove("active");
         teachersPage.classList.remove("active");
         attendancePage.classList.remove("active");
+        gradesPage.classList.remove("active");
         otherPage.classList.remove("active");
 
         document
@@ -2278,6 +2420,14 @@
             attendancePage.classList.add("active");
             loadAttendanceModule().catch(function(error) {
                 console.error("دریافت حضور و غیاب انجام نشد:", error);
+            });
+            return;
+        }
+
+        if (moduleName === "grades") {
+            gradesPage.classList.add("active");
+            loadGradesModule().catch(function(error) {
+                console.error("دریافت نمرات انجام نشد:", error);
             });
             return;
         }
@@ -2691,6 +2841,445 @@
         }
     }
 
+
+
+    /* =========================================================
+       GRADES MANAGEMENT
+       ========================================================= */
+
+    let gradesClasses = [];
+    let gradesSubjects = [];
+    let gradesTypes = [];
+    let gradesStudents = [];
+    let gradesExisting = [];
+    let gradesInitialized = false;
+
+    function gradeTodayISO() {
+        return todayISO();
+    }
+
+    function gradeDisplayName(item) {
+        return [item.first_name, item.last_name].filter(Boolean).join(" ").trim() || "بدون نام";
+    }
+
+    function renderGradesSummary() {
+        const total = gradesStudents.length;
+        const saved = gradesStudents.filter(s => gradesExisting.some(g => g.student_id === s.student_id)).length;
+        const missing = Math.max(0, total - saved);
+        document.getElementById("gradesSummary").innerHTML = `
+            <span class="summary-badge">دانش‌آموزان: ${total}</span>
+            <span class="summary-badge">ثبت‌شده: ${saved}</span>
+            <span class="summary-badge">بدون نمره: ${missing}</span>
+        `;
+    }
+
+    function getSelectedGradeType() {
+        const id = document.getElementById("gradesType").value;
+        return gradesTypes.find(x => x.id === id) || null;
+    }
+
+    function getExistingGradeForStudent(studentId) {
+        return gradesExisting.find(g => g.student_id === studentId) || null;
+    }
+
+    function renderGradesEntryTable() {
+        const body = document.getElementById("gradesEntryBody");
+        const gradeType = getSelectedGradeType();
+
+        if (!gradesStudents.length) {
+            body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">👨‍🎓</div><div>دانش‌آموزی برای این کلاس ثبت نشده است.</div></div></td></tr>`;
+            renderGradesSummary();
+            return;
+        }
+
+        const maxScore = gradeType?.max_score ?? "";
+        body.innerHTML = gradesStudents.map((student, index) => {
+            const existing = getExistingGradeForStudent(student.student_id);
+            const score = existing?.score ?? "";
+            const description = existing?.description ?? "";
+            const stateClass = existing ? "saved" : "missing";
+            const stateText = existing ? "ثبت شده" : "بدون نمره";
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="student-name">${escapeHtml(gradeDisplayName(student))}</div>
+                        <div class="student-id">کد: ${escapeHtml(student.student_code || "—")} | شماره: ${escapeHtml(student.student_number || "—")}</div>
+                    </td>
+                    <td>
+                        <input class="grade-score-input" type="number" min="0" max="${escapeHtml(maxScore)}" step="0.01"
+                            data-grade-score="${student.student_id}" value="${escapeHtml(score)}" placeholder="—">
+                        ${maxScore !== "" ? `<div class="grade-max">از ${escapeHtml(maxScore)}</div>` : ""}
+                    </td>
+                    <td>
+                        <input class="grade-description-input" type="text" maxlength="500"
+                            data-grade-description="${student.student_id}" value="${escapeHtml(description)}" placeholder="توضیح اختیاری">
+                    </td>
+                    <td><span class="grade-state ${stateClass}" data-grade-state="${student.student_id}">${stateText}</span></td>
+                </tr>
+            `;
+        }).join("");
+
+        body.querySelectorAll("[data-grade-score]").forEach(input => {
+            input.addEventListener("input", function() {
+                const state = document.querySelector(`[data-grade-state="${CSS.escape(this.dataset.gradeScore)}"]`);
+                if (state) state.textContent = this.value === "" ? "بدون نمره" : "آماده ثبت";
+                if (state) state.className = "grade-state " + (this.value === "" ? "missing" : "saved");
+            });
+        });
+
+        renderGradesSummary();
+    }
+
+    function renderGradesHistory(data) {
+        const body = document.getElementById("gradesHistoryBody");
+        if (!data?.length) {
+            body.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">📚</div><div>برای انتخاب فعلی نمره‌ای ثبت نشده است.</div></div></td></tr>`;
+            return;
+        }
+
+        const canDelete = currentUserRoles.includes("admin") || currentUserRoles.includes("deputy");
+        body.innerHTML = data.map(record => `
+            <tr>
+                <td>${escapeHtml(record.grade_date || "—")}</td>
+                <td>
+                    <div class="student-name">${escapeHtml(record.student_first_name)} ${escapeHtml(record.student_last_name)}</div>
+                    <div class="student-id">${escapeHtml(record.student_code || "—")}</div>
+                </td>
+                <td>${escapeHtml(record.subject_name || "—")}</td>
+                <td>${escapeHtml(record.grade_type_name || "—")}</td>
+                <td class="grade-score-cell">${escapeHtml(record.score ?? "—")} <small>/ ${escapeHtml(record.max_score ?? "—")}</small></td>
+                <td>${escapeHtml(record.description || "—")}</td>
+                <td>${escapeHtml([record.teacher_first_name, record.teacher_last_name].filter(Boolean).join(" ") || "—")}</td>
+                <td>
+                    ${canDelete ? `<button type="button" class="grade-delete-btn" data-grade-delete="${escapeHtml(record.grade_id)}">🗑 حذف</button>` : "—"}
+                </td>
+            </tr>
+        `).join("");
+
+        body.querySelectorAll("[data-grade-delete]").forEach(button => {
+            button.addEventListener("click", async function() {
+                const gradeId = this.dataset.gradeDelete;
+                if (!confirm("آیا از حذف این نمره مطمئن هستید؟")) return;
+                this.disabled = true;
+                try {
+                    const { error } = await supabaseClient.rpc("delete_grade", { p_grade_id: gradeId });
+                    if (error) throw error;
+                    showMessage(document.getElementById("gradesPageMessage"), "نمره با موفقیت حذف شد.", "success");
+                    await loadGradesExisting();
+                    renderGradesEntryTable();
+                    await loadGradesHistory();
+                } catch (error) {
+                    console.error("delete_grade:", error);
+                    showMessage(document.getElementById("gradesPageMessage"), "حذف نمره انجام نشد: " + error.message, "error");
+                } finally {
+                    this.disabled = false;
+                }
+            });
+        });
+    }
+
+    function setGradeSelect(selectId, items, placeholder, labelFn) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>` + (items || []).map(item =>
+            `<option value="${escapeHtml(item.id)}">${escapeHtml(labelFn(item))}</option>`
+        ).join("");
+        select.disabled = !(items && items.length);
+    }
+
+    async function loadGradesClasses() {
+        const select = document.getElementById("gradesClass");
+        select.disabled = true;
+        select.innerHTML = `<option value="">در حال دریافت کلاس‌ها...</option>`;
+        const { data, error } = await supabaseClient.rpc("get_my_school_classes");
+        if (error) throw error;
+        gradesClasses = data || [];
+        setGradeSelect("gradesClass", gradesClasses, gradesClasses.length ? "انتخاب کلاس" : "هیچ کلاسی ثبت نشده است", c =>
+            `${c.name}${c.grade ? " — " + c.grade : ""}${c.section ? " " + c.section : ""}`
+        );
+        if (gradesClasses.length === 1) select.value = gradesClasses[0].id;
+    }
+
+    async function loadGradesTypes() {
+        const select = document.getElementById("gradesType");
+        select.disabled = true;
+        select.innerHTML = `<option value="">در حال دریافت انواع نمره...</option>`;
+        const { data, error } = await supabaseClient.rpc("get_my_school_grade_types");
+        if (error) throw error;
+        gradesTypes = data || [];
+        setGradeSelect("gradesType", gradesTypes, gradesTypes.length ? "انتخاب نوع نمره" : "هیچ نوع نمره‌ای تعریف نشده است", x =>
+            `${x.name}${x.max_score != null ? " — سقف " + x.max_score : ""}`
+        );
+    }
+
+    async function loadGradesSubjects() {
+        const classId = document.getElementById("gradesClass").value;
+        const subjectSelect = document.getElementById("gradesSubject");
+        subjectSelect.disabled = true;
+        subjectSelect.innerHTML = `<option value="">در حال دریافت دروس...</option>`;
+        gradesSubjects = [];
+        gradesStudents = [];
+        gradesExisting = [];
+        renderGradesEntryTable();
+        document.getElementById("gradesHistoryBody").innerHTML = `<tr><td colspan="8"><div class="empty-state">درس را انتخاب کنید.</div></td></tr>`;
+        if (!classId) {
+            subjectSelect.innerHTML = `<option value="">ابتدا کلاس را انتخاب کنید</option>`;
+            return;
+        }
+        const { data, error } = await supabaseClient.rpc("get_class_subjects_for_grades", { p_class_id: classId });
+        if (error) throw error;
+        gradesSubjects = data || [];
+        subjectSelect.innerHTML = `<option value="">${gradesSubjects.length ? "انتخاب درس" : "هیچ درسی برای این کلاس تعریف نشده است"}</option>` + gradesSubjects.map(x =>
+            `<option value="${escapeHtml(x.class_subject_id)}">${escapeHtml(x.subject_name)}${x.units != null ? " — " + escapeHtml(x.units) + " واحد" : ""}${x.teacher_first_name ? " — " + escapeHtml([x.teacher_first_name,x.teacher_last_name].filter(Boolean).join(" ")) : ""}</option>`
+        ).join("");
+        subjectSelect.disabled = !gradesSubjects.length;
+        if (gradesSubjects.length === 1) subjectSelect.value = gradesSubjects[0].class_subject_id;
+    }
+
+    async function loadGradesStudents() {
+        const classId = document.getElementById("gradesClass").value;
+        const body = document.getElementById("gradesEntryBody");
+        gradesStudents = [];
+        gradesExisting = [];
+        renderGradesEntryTable();
+        if (!classId) return;
+        body.innerHTML = `<tr><td colspan="5"><div class="empty-state">در حال دریافت دانش‌آموزان...</div></td></tr>`;
+        const { data, error } = await supabaseClient.rpc("get_class_students_for_grades", { p_class_id: classId });
+        if (error) throw error;
+        gradesStudents = data || [];
+        await loadGradesExisting();
+        renderGradesEntryTable();
+    }
+
+    async function loadGradesExisting() {
+        const classId = document.getElementById("gradesClass").value;
+        const subjectId = document.getElementById("gradesSubject").value || null;
+        const typeId = document.getElementById("gradesType").value || null;
+        const date = document.getElementById("gradesDate").value || null;
+        if (!classId || !subjectId || !typeId) {
+            gradesExisting = [];
+            return;
+        }
+        const { data, error } = await supabaseClient.rpc("get_class_grades", {
+            p_class_id: classId,
+            p_class_subject_id: subjectId,
+            p_grade_type_id: typeId,
+            p_from_date: date,
+            p_to_date: date
+        });
+        if (error) throw error;
+        gradesExisting = data || [];
+    }
+
+    async function loadGradesHistory() {
+        const classId = document.getElementById("gradesClass").value;
+        const subjectId = document.getElementById("gradesSubject").value || null;
+        const typeId = document.getElementById("gradesType").value || null;
+        const date = document.getElementById("gradesDate").value || null;
+        const body = document.getElementById("gradesHistoryBody");
+        if (!classId || !subjectId || !typeId) {
+            body.innerHTML = `<tr><td colspan="8"><div class="empty-state">کلاس، درس و نوع نمره را انتخاب کنید.</div></td></tr>`;
+            return;
+        }
+        body.innerHTML = `<tr><td colspan="8"><div class="empty-state">در حال دریافت نمرات...</div></td></tr>`;
+        const { data, error } = await supabaseClient.rpc("get_class_grades", {
+            p_class_id: classId,
+            p_class_subject_id: subjectId,
+            p_grade_type_id: typeId,
+            p_from_date: date,
+            p_to_date: date
+        });
+        if (error) throw error;
+        renderGradesHistory(data || []);
+    }
+
+    async function refreshGradesSelection() {
+        hideMessage(document.getElementById("gradesPageMessage"));
+        await loadGradesSubjects();
+        const classId = document.getElementById("gradesClass").value;
+        if (classId) await loadGradesStudents();
+        const subjectId = document.getElementById("gradesSubject").value;
+        const typeId = document.getElementById("gradesType").value;
+        if (classId && subjectId && typeId) {
+            await loadGradesExisting();
+            renderGradesEntryTable();
+            await loadGradesHistory();
+        }
+    }
+
+    async function saveAllGrades() {
+        const classId = document.getElementById("gradesClass").value;
+        const subjectId = document.getElementById("gradesSubject").value;
+        const typeId = document.getElementById("gradesType").value;
+        const date = document.getElementById("gradesDate").value;
+        const button = document.getElementById("saveAllGradesButton");
+        const gradeType = getSelectedGradeType();
+
+        hideMessage(document.getElementById("gradesPageMessage"));
+        if (!classId || !subjectId || !typeId || !date) {
+            showMessage(document.getElementById("gradesPageMessage"), "کلاس، درس، نوع نمره و تاریخ را کامل انتخاب کنید.", "error");
+            return;
+        }
+        if (!gradesStudents.length) {
+            showMessage(document.getElementById("gradesPageMessage"), "این کلاس دانش‌آموزی برای ثبت نمره ندارد.", "error");
+            return;
+        }
+        const maxScore = Number(gradeType?.max_score);
+        const inputs = [...document.querySelectorAll("[data-grade-score]")];
+        const records = [];
+        for (const student of gradesStudents) {
+            const scoreInput = document.querySelector(`[data-grade-score="${CSS.escape(student.student_id)}"]`);
+            const descInput = document.querySelector(`[data-grade-description="${CSS.escape(student.student_id)}"]`);
+            const raw = scoreInput?.value.trim() ?? "";
+            if (raw === "") continue;
+            const score = Number(raw);
+            if (!Number.isFinite(score) || score < 0 || (Number.isFinite(maxScore) && score > maxScore)) {
+                showMessage(document.getElementById("gradesPageMessage"), `نمره ${gradeDisplayName(student)} معتبر نیست. مقدار باید بین ۰ و ${maxScore} باشد.`, "error");
+                scoreInput?.focus();
+                return;
+            }
+            records.push({ student, score, description: descInput?.value.trim() || null });
+        }
+        if (!records.length) {
+            showMessage(document.getElementById("gradesPageMessage"), "حداقل یک نمره وارد کنید.", "error");
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "در حال ثبت نمرات...";
+        let successCount = 0;
+        try {
+            for (const record of records) {
+                const { error } = await supabaseClient.rpc("save_grade", {
+                    p_student_id: record.student.student_id,
+                    p_class_subject_id: subjectId,
+                    p_grade_type_id: typeId,
+                    p_score: record.score,
+                    p_max_score: Number.isFinite(maxScore) ? maxScore : null,
+                    p_description: record.description,
+                    p_grade_date: date
+                });
+                if (error) throw error;
+                successCount++;
+            }
+            showMessage(document.getElementById("gradesPageMessage"), `${successCount} نمره با موفقیت ثبت/ویرایش شد.`, "success");
+            await loadGradesExisting();
+            renderGradesEntryTable();
+            await loadGradesHistory();
+        } catch (error) {
+            console.error("save_grade:", error);
+            showMessage(document.getElementById("gradesPageMessage"), `ثبت نمرات متوقف شد. ${successCount} نمره ثبت شد. خطا: ${error.message}`, "error");
+            await loadGradesExisting();
+            renderGradesEntryTable();
+        } finally {
+            button.disabled = false;
+            button.textContent = "💾 ثبت همه نمرات";
+        }
+    }
+
+    async function loadGradesModule() {
+        if (!gradesInitialized) {
+            document.getElementById("gradesDate").value = gradeTodayISO();
+
+            document.getElementById("gradesClass").addEventListener("change", async function() {
+                try {
+                    await loadGradesSubjects();
+                    if (this.value) await loadGradesStudents();
+                    const subjectId = document.getElementById("gradesSubject").value;
+                    const typeId = document.getElementById("gradesType").value;
+                    if (this.value && subjectId && typeId) {
+                        await loadGradesExisting();
+                        renderGradesEntryTable();
+                        await loadGradesHistory();
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("gradesPageMessage"), "دریافت اطلاعات نمرات انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("gradesSubject").addEventListener("change", async function() {
+                try {
+                    await loadGradesStudents();
+                    if (this.value && document.getElementById("gradesType").value) {
+                        await loadGradesExisting();
+                        renderGradesEntryTable();
+                        await loadGradesHistory();
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("gradesPageMessage"), "دریافت اطلاعات درس انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("gradesType").addEventListener("change", async function() {
+                try {
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && this.value) {
+                        await loadGradesExisting();
+                        renderGradesEntryTable();
+                        await loadGradesHistory();
+                    } else {
+                        renderGradesEntryTable();
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("gradesPageMessage"), "دریافت نمرات انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("gradesDate").addEventListener("change", async function() {
+                try {
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value) {
+                        await loadGradesExisting();
+                        renderGradesEntryTable();
+                        await loadGradesHistory();
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("gradesPageMessage"), "دریافت نمرات انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("saveAllGradesButton").addEventListener("click", saveAllGrades);
+
+            document.getElementById("refreshGradesButton").addEventListener("click", async function() {
+                this.disabled = true;
+                try {
+                    await loadGradesClasses();
+                    await loadGradesTypes();
+                    if (document.getElementById("gradesClass").value) {
+                        await loadGradesSubjects();
+                        if (document.getElementById("gradesSubject").value) await loadGradesStudents();
+                    }
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value) {
+                        await loadGradesExisting();
+                        renderGradesEntryTable();
+                        await loadGradesHistory();
+                    }
+                    showMessage(document.getElementById("gradesPageMessage"), "اطلاعات نمرات بروزرسانی شد.", "success");
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("gradesPageMessage"), "بروزرسانی نمرات انجام نشد: " + error.message, "error");
+                } finally {
+                    this.disabled = false;
+                }
+            });
+
+            gradesInitialized = true;
+        }
+
+        await loadGradesClasses();
+        await loadGradesTypes();
+        if (document.getElementById("gradesClass").value) {
+            await loadGradesSubjects();
+            if (document.getElementById("gradesSubject").value) await loadGradesStudents();
+        }
+        if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value) {
+            await loadGradesExisting();
+            renderGradesEntryTable();
+            await loadGradesHistory();
+        }
+    }
 
     /* =========================================================
        TEACHERS MANAGEMENT
