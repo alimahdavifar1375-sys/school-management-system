@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>سامانه مدیریت مدرسه</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f4f7fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 15px;
+            direction: ltr;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #message {
+            margin-top: 18px;
+            text-align: center;
+            min-height: 24px;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h1>سامانه مدرسه</h1>
+
+    <div class="subtitle">
+        ورود به حساب کاربری
+    </div>
+
+    <form id="loginForm">
+
+        <label for="email">
+            ایمیل
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="example@email.com"
+            required
+        >
+
+        <label for="password">
+            رمز عبور
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="رمز عبور"
+            required
+        >
+
+        <button type="submit">
+            ورود
+        </button>
+
+    </form>
+
+    <div id="message"></div>
+
+</div>
+
+<script>
+
+    const SUPABASE_URL =
+        "https://ebimjoeubatymlpthor.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+        "sb_publishable_00YDsLqILFIxhYgdZsRkyw_3CGXGhWb";
+
+    const { createClient } = window.supabase;
+
+    const supabase = createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+    const loginForm = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+
+
+    loginForm.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        message.textContent = "در حال ورود...";
+        message.className = "";
+
+
+        const email =
+            document.getElementById("email").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+
+        const { data, error } =
+            await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+
+        if (error) {
+
+            message.textContent =
+                "ورود ناموفق بود: " + error.message;
+
+            message.className = "error";
+
+            return;
+        }
+
+
+        message.textContent =
+            "ورود با موفقیت انجام شد.";
+
+        message.className = "success";
+
+
+        console.log("Logged in user:", data.user);
+
+    });
+
+</script>
+
+</body>
+</html>
