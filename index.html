@@ -212,6 +212,319 @@
             opacity: 0.6;
             pointer-events: none;
         }
+
+        /* =========================
+           ADMIN DASHBOARD
+           ========================= */
+        .dashboard-shell {
+            width: 100%;
+            max-width: 1180px;
+            padding: 20px;
+        }
+
+        .dashboard {
+            background: #f8fafc;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.10);
+            min-height: 680px;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+        .brand-title {
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .brand-school {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #3730a3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .dashboard-body {
+            display: grid;
+            grid-template-columns: 235px 1fr;
+            min-height: 610px;
+        }
+
+        .sidebar {
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            padding: 18px 12px;
+        }
+
+        .nav-title {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #334155;
+            text-align: right;
+            padding: 11px 12px;
+            border-radius: 10px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .nav-item:hover {
+            background: #f1f5f9;
+        }
+
+        .nav-item.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-icon {
+            display: inline-block;
+            width: 25px;
+        }
+
+        .dashboard-main {
+            padding: 25px;
+            overflow: auto;
+        }
+
+        .welcome-box {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        .welcome-box h2 {
+            margin: 0 0 7px;
+            font-size: 23px;
+        }
+
+        .welcome-box p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 13px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 18px;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .stat-title {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .stat-value {
+            font-size: 25px;
+            font-weight: 800;
+            margin-top: 5px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 14px;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .module-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+            border-color: #c7d2fe;
+        }
+
+        .module-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            margin-bottom: 12px;
+        }
+
+        .module-card h3 {
+            margin: 0 0 5px;
+            font-size: 14px;
+        }
+
+        .module-card p {
+            margin: 0;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .dashboard-footer {
+            margin-top: 24px;
+            color: #94a3b8;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .logout-dashboard {
+            width: auto;
+            padding: 9px 13px;
+            background: #fef2f2;
+            color: #b91c1c;
+            font-size: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-left: none;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                overflow-x: auto;
+                gap: 5px;
+            }
+
+            .nav-title {
+                display: none;
+            }
+
+            .nav-item {
+                min-width: max-content;
+                margin: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modules-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-shell {
+                padding: 8px;
+            }
+
+            .dashboard-header {
+                padding: 14px;
+            }
+
+            .user-name,
+            .user-role {
+                display: none;
+            }
+
+            .dashboard-main {
+                padding: 16px;
+            }
+
+            .stats-grid,
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-box {
+                padding: 19px;
+            }
+        }
+
     </style>
 </head>
 
@@ -359,47 +672,212 @@
     </div>
 
 
-    <!-- ACCOUNT -->
-    <div id="accountCard" class="card hidden">
 
-        <div class="logo">👤</div>
+    <!-- ADMIN DASHBOARD -->
+    <div id="accountCard" class="dashboard-shell hidden">
 
-        <h1>ورود موفق</h1>
+        <div class="dashboard">
 
-        <div class="subtitle">
-            اطلاعات حساب کاربری
+            <header class="dashboard-header">
+
+                <div class="brand-area">
+                    <div class="brand-icon">🏫</div>
+                    <div>
+                        <div class="brand-title">سامانه مدیریت مدرسه</div>
+                        <div class="brand-school" id="dashboardSchool">مدرسه من</div>
+                    </div>
+                </div>
+
+                <div class="user-area">
+                    <div>
+                        <div class="user-name" id="dashboardUserName">مدیر سامانه</div>
+                        <div class="user-role" id="dashboardUserRole">مدیر</div>
+                    </div>
+                    <div class="avatar" id="dashboardAvatar">م</div>
+                    <button id="dashboardLogoutButton" class="logout-dashboard">
+                        خروج
+                    </button>
+                </div>
+
+            </header>
+
+            <div class="dashboard-body">
+
+                <aside class="sidebar">
+
+                    <div class="nav-title">مدیریت مدرسه</div>
+
+                    <button class="nav-item active" data-module="dashboard">
+                        <span class="nav-icon">📊</span> داشبورد
+                    </button>
+
+                    <button class="nav-item" data-module="students">
+                        <span class="nav-icon">👨‍🎓</span> دانش‌آموزان
+                    </button>
+
+                    <button class="nav-item" data-module="teachers">
+                        <span class="nav-icon">👨‍🏫</span> معلمان
+                    </button>
+
+                    <button class="nav-item" data-module="classes">
+                        <span class="nav-icon">🏫</span> کلاس‌ها
+                    </button>
+
+                    <button class="nav-item" data-module="subjects">
+                        <span class="nav-icon">📚</span> دروس
+                    </button>
+
+                    <div class="nav-title">آموزشی</div>
+
+                    <button class="nav-item" data-module="attendance">
+                        <span class="nav-icon">📋</span> حضور و غیاب
+                    </button>
+
+                    <button class="nav-item" data-module="grades">
+                        <span class="nav-icon">📝</span> نمرات و کارنامه
+                    </button>
+
+                    <button class="nav-item" data-module="exams">
+                        <span class="nav-icon">🧪</span> آزمون آنلاین
+                    </button>
+
+                    <button class="nav-item" data-module="discipline">
+                        <span class="nav-icon">⚠️</span> انضباط
+                    </button>
+
+                    <div class="nav-title">ارتباطات</div>
+
+                    <button class="nav-item" data-module="chat">
+                        <span class="nav-icon">💬</span> پیام‌ها
+                    </button>
+
+                    <button class="nav-item" data-module="online">
+                        <span class="nav-icon">🎥</span> کلاس آنلاین
+                    </button>
+
+                </aside>
+
+                <main class="dashboard-main">
+
+                    <div id="dashboardMessage" class="message"></div>
+
+                    <section id="dashboardHome">
+
+                        <div class="welcome-box">
+                            <h2 id="welcomeTitle">خوش آمدید 👋</h2>
+                            <p>
+                                پنل مدیریت مدرسه آماده است. از منوی کنار، بخش موردنظر را انتخاب کنید.
+                            </p>
+                        </div>
+
+                        <div class="stats-grid">
+
+                            <div class="stat-card">
+                                <div class="stat-icon">👨‍🎓</div>
+                                <div class="stat-title">دانش‌آموزان</div>
+                                <div class="stat-value">—</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">👨‍🏫</div>
+                                <div class="stat-title">معلمان</div>
+                                <div class="stat-value">—</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">🏫</div>
+                                <div class="stat-title">کلاس‌ها</div>
+                                <div class="stat-value">—</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">📚</div>
+                                <div class="stat-title">دروس</div>
+                                <div class="stat-value">—</div>
+                            </div>
+
+                        </div>
+
+                        <h2 class="section-title">بخش‌های سامانه</h2>
+
+                        <div class="modules-grid">
+
+                            <div class="module-card" data-module="students">
+                                <div class="module-icon">👨‍🎓</div>
+                                <h3>مدیریت دانش‌آموزان</h3>
+                                <p>ثبت، ویرایش و مشاهده اطلاعات دانش‌آموزان.</p>
+                            </div>
+
+                            <div class="module-card" data-module="teachers">
+                                <div class="module-icon">👨‍🏫</div>
+                                <h3>مدیریت معلمان</h3>
+                                <p>مدیریت اطلاعات و ارتباط معلمان با کلاس‌ها.</p>
+                            </div>
+
+                            <div class="module-card" data-module="classes">
+                                <div class="module-icon">🏫</div>
+                                <h3>مدیریت کلاس‌ها</h3>
+                                <p>ساخت کلاس و مدیریت اعضای هر کلاس.</p>
+                            </div>
+
+                            <div class="module-card" data-module="subjects">
+                                <div class="module-icon">📚</div>
+                                <h3>مدیریت دروس</h3>
+                                <p>تعریف درس، واحد و ارتباط درس با کلاس.</p>
+                            </div>
+
+                            <div class="module-card" data-module="attendance">
+                                <div class="module-icon">📋</div>
+                                <h3>حضور و غیاب</h3>
+                                <p>ثبت و مشاهده وضعیت حضور دانش‌آموزان.</p>
+                            </div>
+
+                            <div class="module-card" data-module="grades">
+                                <div class="module-icon">📝</div>
+                                <h3>نمرات و کارنامه</h3>
+                                <p>ثبت نمرات و آماده‌سازی کارنامه.</p>
+                            </div>
+
+                            <div class="module-card" data-module="exams">
+                                <div class="module-icon">🧪</div>
+                                <h3>آزمون آنلاین</h3>
+                                <p>ساخت و مدیریت آزمون‌های آنلاین.</p>
+                            </div>
+
+                            <div class="module-card" data-module="discipline">
+                                <div class="module-icon">⚠️</div>
+                                <h3>انضباط</h3>
+                                <p>ثبت و پیگیری موارد انضباطی.</p>
+                            </div>
+
+                            <div class="module-card" data-module="chat">
+                                <div class="module-icon">💬</div>
+                                <h3>پیام‌رسانی</h3>
+                                <p>اتاق‌های گفت‌وگو و پیام‌های مدرسه.</p>
+                            </div>
+
+                            <div class="module-card" data-module="online">
+                                <div class="module-icon">🎥</div>
+                                <h3>کلاس آنلاین</h3>
+                                <p>مدیریت جلسات و لینک کلاس‌های آنلاین.</p>
+                            </div>
+
+                        </div>
+
+                        <div class="dashboard-footer">
+                            نسخه اولیه داشبورد مدیریت مدرسه
+                        </div>
+
+                    </section>
+
+                </main>
+
+            </div>
+
         </div>
-
-        <div id="accountMessage" class="message"></div>
-
-        <div class="account-box">
-
-            <div class="account-title">
-                حساب کاربری شما
-            </div>
-
-            <div class="account-row">
-                <span>نام</span>
-                <strong id="accountName">-</strong>
-            </div>
-
-            <div class="account-row">
-                <span>مدرسه</span>
-                <strong id="accountSchool">-</strong>
-            </div>
-
-            <div class="account-row">
-                <span>نقش</span>
-                <strong id="accountRoles">-</strong>
-            </div>
-
-        </div>
-
-        <button id="logoutButton" class="secondary">
-            خروج از حساب
-        </button>
 
     </div>
+
 
 </div>
 
@@ -461,10 +939,7 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
     const backToLoginFromForgot =
         document.getElementById("backToLoginFromForgot");
 
-    const logoutButton =
-        document.getElementById("logoutButton");
-
-
+ 
     // =========================================================
     // MESSAGE HELPERS
     // =========================================================
@@ -589,20 +1064,15 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
         const {
             data,
             error
-        } =
-            await supabaseClient.rpc(
-                "get_my_account_info"
-            );
-
+        } = await supabaseClient.rpc("get_my_account_info");
 
         if (error) {
-
             console.error(error);
 
             showOnly(accountCard);
 
             showMessage(
-                document.getElementById("accountMessage"),
+                document.getElementById("dashboardMessage"),
                 "ورود موفق بود، اما دریافت اطلاعات حساب با خطا مواجه شد.",
                 "error"
             );
@@ -610,66 +1080,33 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
             return;
         }
 
+        console.log("Account info:", data);
 
-        console.log(
-            "Account info:",
-            data
-        );
+        const firstName = data?.first_name || "";
+        const lastName = data?.last_name || "";
+        const fullName = (firstName + " " + lastName).trim() || "مدیر سامانه";
+        const schoolName = data?.school_name || "مدرسه من";
+        const roles = data?.roles || [];
 
+        document.getElementById("dashboardUserName").textContent = fullName;
+        document.getElementById("dashboardSchool").textContent = schoolName;
 
-        const firstName =
-            data?.first_name || "";
+        const roleNames = roles
+            .map(function(item) {
+                return item.role || "";
+            })
+            .filter(Boolean);
 
-        const lastName =
-            data?.last_name || "";
+        document.getElementById("dashboardUserRole").textContent =
+            roleNames.length ? roleNames.join("، ") : "کاربر سامانه";
 
+        document.getElementById("dashboardAvatar").textContent =
+            fullName.charAt(0) || "م";
 
-        document.getElementById("accountName")
-            .textContent =
-            (firstName + " " + lastName).trim() || "-";
-
-
-        document.getElementById("accountSchool")
-            .textContent =
-            data?.school_name || "-";
-
-
-        const roles =
-            data?.roles || [];
-
-
-        const rolesContainer =
-            document.getElementById("accountRoles");
-
-
-        rolesContainer.innerHTML = "";
-
-
-        if (roles.length === 0) {
-
-            rolesContainer.textContent = "-";
-
-        } else {
-
-            roles.forEach(function(roleItem) {
-
-                const span =
-                    document.createElement("span");
-
-                span.className = "role";
-
-                span.textContent =
-                    roleItem.role || "-";
-
-                rolesContainer.appendChild(span);
-
-            });
-
-        }
-
+        document.getElementById("welcomeTitle").textContent =
+            "خوش آمدید " + fullName + " 👋";
 
         showOnly(accountCard);
-
     }
 
 
@@ -948,7 +1385,7 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
     // LOGOUT
     // =========================================================
 
-    logoutButton.addEventListener(
+    document.getElementById("dashboardLogoutButton").addEventListener(
         "click",
         async function() {
 
@@ -977,6 +1414,66 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
 
         }
     );
+
+
+    // =========================================================
+    // DASHBOARD NAVIGATION
+    // =========================================================
+
+    document.querySelectorAll("[data-module]").forEach(function(item) {
+
+        item.addEventListener("click", function() {
+
+            const moduleName = item.getAttribute("data-module");
+
+            if (moduleName === "dashboard") {
+                document.getElementById("dashboardHome").classList.remove("hidden");
+
+                document.querySelectorAll(".nav-item").forEach(function(nav) {
+                    nav.classList.remove("active");
+                });
+
+                const dashboardNav = document.querySelector('.nav-item[data-module="dashboard"]');
+                if (dashboardNav) dashboardNav.classList.add("active");
+
+                hideMessage(document.getElementById("dashboardMessage"));
+                return;
+            }
+
+            document.querySelectorAll(".nav-item").forEach(function(nav) {
+                nav.classList.remove("active");
+            });
+
+            const matchingNav = document.querySelector('.nav-item[data-module="' + moduleName + '"]');
+            if (matchingNav) matchingNav.classList.add("active");
+
+            showMessage(
+                document.getElementById("dashboardMessage"),
+                "بخش «" + getModuleTitle(moduleName) + "» در مرحله بعد ساخته می‌شود.",
+                "info"
+            );
+        });
+
+    });
+
+
+    function getModuleTitle(moduleName) {
+
+        const titles = {
+            students: "دانش‌آموزان",
+            teachers: "معلمان",
+            classes: "کلاس‌ها",
+            subjects: "دروس",
+            attendance: "حضور و غیاب",
+            grades: "نمرات و کارنامه",
+            exams: "آزمون آنلاین",
+            discipline: "انضباط",
+            chat: "پیام‌ها",
+            online: "کلاس آنلاین"
+        };
+
+        return titles[moduleName] || "این بخش";
+    }
 
 
     // =========================================================
