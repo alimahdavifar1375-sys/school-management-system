@@ -2749,9 +2749,24 @@
         const title = document.getElementById("disciplineTitle").value.trim();
         const description = document.getElementById("disciplineDescription").value.trim() || null;
         const severity = document.getElementById("disciplineSeverity").value;
-        const recordDate = document.getElementById("disciplineDate").value;
-        if (!studentId || !type || !title || !recordDate) {
-            showMessage(document.getElementById("disciplinePageMessage"), "دانش‌آموز، نوع، عنوان و تاریخ را کامل کنید.", "error");
+        const disciplineDateInput = document.getElementById("disciplineDate");
+        const recordDate = disciplineDateInput.value || todayISO();
+
+        // اگر تاریخ خالی باشد، تاریخ امروز را خودکار قرار می‌دهیم.
+        disciplineDateInput.value = recordDate;
+
+        const missingFields = [];
+        if (!studentId) missingFields.push("دانش‌آموز");
+        if (!type) missingFields.push("نوع مورد");
+        if (!title) missingFields.push("عنوان");
+        if (!recordDate) missingFields.push("تاریخ");
+
+        if (missingFields.length) {
+            showMessage(
+                document.getElementById("disciplinePageMessage"),
+                "لطفاً این موارد را کامل کنید: " + missingFields.join("، ") + ".",
+                "error"
+            );
             return;
         }
         const button = document.getElementById("saveDisciplineButton");
