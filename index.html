@@ -987,7 +987,20 @@
                 width: 100%;
             }
         }
-    </style>
+    
+/* TEACHERS MODULE */
+.teachers-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:16px}
+.teacher-assignment-card{margin-top:18px}
+.assignment-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:16px}
+.assignment-form-grid .form-group.full{grid-column:1/-1}
+.teachers-table,.assignments-table{width:100%;border-collapse:collapse}
+.teachers-table th,.teachers-table td,.assignments-table th,.assignments-table td{padding:11px 10px;border-bottom:1px solid var(--border-color,#e5e7eb);text-align:right;vertical-align:middle}
+.teachers-table th,.assignments-table th{font-weight:700;white-space:nowrap}
+.teacher-name{font-weight:700}.teacher-meta{font-size:11px;opacity:.7;margin-top:3px}
+@media(max-width:900px){.assignment-form-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.assignment-form-grid{grid-template-columns:1fr}.assignment-form-grid .form-group.full{grid-column:auto}.teachers-table,.assignments-table{min-width:760px}}
+
+</style>
 </head>
 
 <body>
@@ -1395,6 +1408,55 @@
                     </section>
 
 
+                    <!-- TEACHERS -->
+                    <section id="teachersPage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>👨‍🏫 مدیریت معلمان</h2>
+                                <p>ایجاد حساب معلم و اختصاص معلم به درس و کلاس</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshTeachersButton" class="small-btn">🔄 بروزرسانی</button>
+                                <button id="addTeacherButton" class="small-btn">➕ افزودن معلم</button>
+                            </div>
+                        </div>
+                        <div id="teachersPageMessage" class="message"></div>
+                        <div class="toolbar">
+                            <input id="teacherSearchInput" type="search" placeholder="جستجو بر اساس نام، نام خانوادگی، ایمیل یا کد پرسنلی...">
+                            <div id="teachersCount" class="count">در حال دریافت...</div>
+                        </div>
+                        <div class="table-card"><div class="table-scroll">
+                            <table class="teachers-table">
+                                <thead><tr><th>#</th><th>معلم</th><th>کد پرسنلی</th><th>تاریخ استخدام</th></tr></thead>
+                                <tbody id="teachersTableBody"><tr><td colspan="4"><div class="empty-state">در حال دریافت معلمان...</div></td></tr></tbody>
+                            </table>
+                        </div></div>
+
+                        <div class="table-card teacher-assignment-card">
+                            <div class="page-header" style="margin-bottom:0">
+                                <div><h3 style="margin:0">🔗 تخصیص کلاس و درس</h3><p>برای هر کلاس و درس، معلم و ساعات هفتگی را مشخص کنید.</p></div>
+                            </div>
+                            <div id="assignmentMessage" class="message"></div>
+                            <form id="assignmentForm">
+                                <div class="assignment-form-grid">
+                                    <div class="form-group"><label for="assignmentClass">کلاس <span class="required">*</span></label><select id="assignmentClass" required><option value="">در حال دریافت...</option></select></div>
+                                    <div class="form-group"><label for="assignmentSubject">درس <span class="required">*</span></label><select id="assignmentSubject" required><option value="">در حال دریافت...</option></select></div>
+                                    <div class="form-group"><label for="assignmentTeacher">معلم</label><select id="assignmentTeacher"><option value="">بدون معلم</option></select></div>
+                                    <div class="form-group"><label for="assignmentHours">ساعات هفتگی</label><input id="assignmentHours" type="number" min="0" step="0.5" placeholder="مثلاً 4"></div>
+                                </div>
+                                <div class="modal-footer"><button id="saveAssignmentButton" class="small-btn success" type="submit">💾 ذخیره تخصیص</button></div>
+                            </form>
+                        </div>
+
+                        <div class="table-card teacher-assignment-card"><div class="table-scroll">
+                            <table class="assignments-table">
+                                <thead><tr><th>#</th><th>کلاس</th><th>درس</th><th>معلم</th><th>ساعات هفتگی</th></tr></thead>
+                                <tbody id="assignmentsTableBody"><tr><td colspan="5"><div class="empty-state">در حال دریافت تخصیص‌ها...</div></td></tr></tbody>
+                            </table>
+                        </div></div>
+                    </section>
+
+
                     <!-- CLASSES -->
                     <section id="classesPage" class="module-page">
                         <div class="page-header">
@@ -1448,6 +1510,30 @@
         </div>
 
     </section>
+
+
+    <!-- =====================================================
+         TEACHER ADD MODAL
+         ===================================================== -->
+    <div id="teacherModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header"><h3>➕ افزودن معلم</h3><button id="closeTeacherModal" class="modal-close" type="button">×</button></div>
+            <form id="teacherForm">
+                <div class="modal-body">
+                    <div id="teacherFormMessage" class="message"></div>
+                    <div class="class-form-grid">
+                        <div class="form-group"><label for="teacherFirstName">نام <span class="required">*</span></label><input id="teacherFirstName" type="text" required maxlength="100"></div>
+                        <div class="form-group"><label for="teacherLastName">نام خانوادگی <span class="required">*</span></label><input id="teacherLastName" type="text" required maxlength="100"></div>
+                        <div class="form-group"><label for="teacherEmail">ایمیل / نام کاربری <span class="required">*</span></label><input id="teacherEmail" type="email" required autocomplete="off"></div>
+                        <div class="form-group"><label for="teacherPassword">رمز عبور <span class="required">*</span></label><input id="teacherPassword" type="password" required minlength="6" autocomplete="new-password"></div>
+                        <div class="form-group"><label for="teacherEmployeeCode">کد پرسنلی</label><input id="teacherEmployeeCode" type="text" maxlength="50"></div>
+                        <div class="form-group"><label for="teacherHireDate">تاریخ استخدام</label><input id="teacherHireDate" type="date"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button id="cancelTeacherButton" type="button" class="small-btn">انصراف</button><button id="saveTeacherButton" type="submit" class="small-btn success">💾 ایجاد حساب معلم</button></div>
+            </form>
+        </div>
+    </div>
 
 
     <!-- =====================================================
@@ -1936,12 +2022,16 @@
         const classesPage =
             document.getElementById("classesPage");
 
+        const teachersPage =
+            document.getElementById("teachersPage");
+
         const otherPage =
             document.getElementById("otherModulePage");
 
         home.classList.add("hidden");
         studentsPage.classList.remove("active");
         classesPage.classList.remove("active");
+        teachersPage.classList.remove("active");
         otherPage.classList.remove("active");
 
         document
@@ -1976,6 +2066,13 @@
                 console.error("دریافت کلاس‌ها انجام نشد:", error);
             });
 
+            return;
+        }
+
+        if (moduleName === "teachers") {
+            teachersPage.classList.add("active");
+            loadTeachers().catch(console.error);
+            loadAssignmentData().catch(console.error);
             return;
         }
 
