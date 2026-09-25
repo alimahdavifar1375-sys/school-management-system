@@ -1351,6 +1351,7 @@
                                             <th>دانش‌آموز</th>
                                             <th>کد ملی</th>
                                             <th>موبایل</th>
+                                            <th>کلاس</th>
                                             <th>وضعیت</th>
                                             <th>عملیات</th>
                                         </tr>
@@ -1359,7 +1360,7 @@
                                     <tbody id="studentsTableBody">
 
                                         <tr>
-                                            <td colspan="6">
+                                            <td colspan="7">
                                                 <div class="empty-state">
                                                     در حال دریافت اطلاعات...
                                                 </div>
@@ -1505,6 +1506,15 @@
                                 تاریخ ثبت‌نام
                             </label>
                             <input id="studentEnrollmentDate" type="date">
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="studentClass">
+                                کلاس <span class="required">*</span>
+                            </label>
+                            <select id="studentClass" required>
+                                <option value="">در حال دریافت کلاس‌ها...</option>
+                            </select>
                         </div>
 
                         <div class="form-group full">
@@ -1885,6 +1895,10 @@
 
             loadStudents();
 
+            loadStudentClasses().catch(function (error) {
+                console.error("دریافت کلاس‌ها انجام نشد:", error);
+            });
+
             return;
         }
 
@@ -1931,6 +1945,7 @@
 
     let allStudents = [];
     let editingStudentId = null;
+    let allClasses = [];
 
 
     const studentModal =
@@ -1940,7 +1955,64 @@
         document.getElementById("studentForm");
 
 
-    function openStudentModal(student = null) {
+    async function loadStudentClasses(selectedClassId = "") {
+
+        const select = document.getElementById("studentClass");
+
+        select.innerHTML = `
+            <option value="">در حال دریافت کلاس‌ها...</option>
+        `;
+
+        select.disabled = true;
+
+        const { data, error } =
+            await supabaseClient.rpc("get_my_school_classes");
+
+        if (error) {
+            console.error(error);
+
+            allClasses = [];
+
+            select.innerHTML = `
+                <option value="">دریافت کلاس‌ها ناموفق بود</option>
+            `;
+
+            select.disabled = false;
+            throw error;
+        }
+
+        allClasses = data || [];
+
+        if (!allClasses.length) {
+            select.innerHTML = `
+                <option value="">هیچ کلاسی برای مدرسه ثبت نشده است</option>
+            `;
+            select.disabled = false;
+            return;
+        }
+
+        select.innerHTML = `
+            <option value="">انتخاب کلاس</option>
+            ${allClasses.map(function (item) {
+                const title =
+                    [item.name, item.grade, item.section]
+                        .filter(Boolean)
+                        .join(" - ");
+
+                return `
+                    <option value="${escapeHtml(item.id)}">
+                        ${escapeHtml(title)}
+                    </option>
+                `;
+            }).join("")}
+        `;
+
+        select.value = selectedClassId || "";
+        select.disabled = false;
+    }
+
+
+    async function openStudentModal(student = null) {
 
         editingStudentId =
             student ? student.id : null;
@@ -1992,6 +2064,18 @@
 
         studentModal.classList.add("open");
 
+        try {
+            await loadStudentClasses(
+                student?.class_id || ""
+            );
+        } catch (error) {
+            showMessage(
+                document.getElementById("studentFormMessage"),
+                "دریافت کلاس‌ها انجام نشد: " + error.message,
+                "error"
+            );
+        }
+
         setTimeout(function () {
             document.getElementById("studentFirstName").focus();
         }, 50);
@@ -2016,8 +2100,8 @@
         .getElementById("addStudentButton")
         .addEventListener(
             "click",
-            function () {
-                openStudentModal();
+            async function () {
+                await openStudentModal();
             }
         );
 
@@ -2099,7 +2183,7 @@
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6">
+                <td colspan="7">
                     <div class="empty-state">
                         در حال دریافت دانش‌آموزان...
                     </div>
@@ -2150,7 +2234,7 @@
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <div class="empty-state">
                             دریافت اطلاعات با خطا مواجه شد.
                         </div>
@@ -2218,6 +2302,64 @@
         });
 
 
+        let classMemberships = [];
+
+        if (allStudents.length) {
+            const studentIds = allStudents.map(student => student.id);
+
+            const {
+                data: membershipData,
+                error: membershipError
+            } = await supabaseClient
+                .from("class_students")
+                .select("student_id, class_id, enrollment_date")
+                .in("student_id", studentIds);
+
+            if (!membershipError) {
+                classMemberships = membershipData || [];
+            } else {
+                console.warn("دریافت کلاس دانش‌آموزان انجام نشد:", membershipError);
+            }
+        }
+
+        const membershipMap = {};
+
+        classMemberships.forEach(function (item) {
+            membershipMap[item.student_id] = item;
+        });
+
+
+        const classIds = [
+            ...new Set(
+                classMemberships
+                    .map(item => item.class_id)
+                    .filter(Boolean)
+            )
+        ];
+
+        let classRows = [];
+
+        if (classIds.length) {
+            const {
+                data: classData,
+                error: classError
+            } = await supabaseClient
+                .from("classes")
+                .select("id, name, grade, section")
+                .in("id", classIds);
+
+            if (!classError) {
+                classRows = classData || [];
+            }
+        }
+
+        const classMap = {};
+
+        classRows.forEach(function (item) {
+            classMap[item.id] = item;
+        });
+
+
         allStudents =
             allStudents.map(function (student) {
 
@@ -2236,7 +2378,15 @@
                         profile?.mobile || "",
 
                     national_code:
-                        profile?.national_code || ""
+                        profile?.national_code || "",
+
+                    class_id:
+                        membershipMap[student.id]?.class_id || "",
+
+                    class_name:
+                        classMap[
+                            membershipMap[student.id]?.class_id
+                        ]?.name || ""
                 };
 
             });
@@ -2266,7 +2416,7 @@
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <div class="empty-state">
                             <div class="icon">👨‍🎓</div>
                             <div>
@@ -2342,6 +2492,12 @@
                             </td>
 
                             <td>
+                                ${escapeHtml(
+                                    student.class_name || "بدون کلاس"
+                                )}
+                            </td>
+
+                            <td>
                                 <span class="status ${statusClass}">
                                     ${statusText}
                                 </span>
@@ -2397,7 +2553,7 @@
 
                 button.addEventListener(
                     "click",
-                    function () {
+                    async function () {
 
                         const id =
                             button.getAttribute(
@@ -2411,7 +2567,7 @@
                             );
 
                         if (student) {
-                            openStudentModal(student);
+                            await openStudentModal(student);
                         }
 
                     }
@@ -2532,7 +2688,8 @@
                         student.father_name,
                         student.mother_name,
                         student.national_code,
-                        student.mobile
+                        student.mobile,
+                        student.class_name
                     ]
                     .join(" ")
                     .toLowerCase();
@@ -2597,6 +2754,11 @@
                     .value
                     .trim();
 
+            const classId =
+                document
+                    .getElementById("studentClass")
+                    .value;
+
 
             if (!firstName || !lastName || !studentCode) {
 
@@ -2608,6 +2770,15 @@
                     "error"
                 );
 
+                return;
+            }
+
+            if (!classId) {
+                showMessage(
+                    document.getElementById("studentFormMessage"),
+                    "انتخاب کلاس برای دانش‌آموز الزامی است.",
+                    "error"
+                );
                 return;
             }
 
@@ -2722,6 +2893,34 @@
                         throw error;
                     }
 
+                    const {
+                        error: removeClassError
+                    } = await supabaseClient
+                        .from("class_students")
+                        .delete()
+                        .eq("student_id", editingStudentId);
+
+                    if (removeClassError) {
+                        throw removeClassError;
+                    }
+
+                    const {
+                        error: addClassError
+                    } = await supabaseClient
+                        .from("class_students")
+                        .insert({
+                            class_id: classId,
+                            student_id: editingStudentId,
+                            enrollment_date:
+                                document
+                                    .getElementById("studentEnrollmentDate")
+                                    .value || null
+                        });
+
+                    if (addClassError) {
+                        throw addClassError;
+                    }
+
 
                     closeStudentModal();
 
@@ -2822,15 +3021,40 @@
 
 
                     const {
+                        data: insertedStudent,
                         error
                     } =
                         await supabaseClient
                             .from("students")
-                            .insert(insertData);
+                            .insert(insertData)
+                            .select("id")
+                            .single();
 
 
                     if (error) {
                         throw error;
+                    }
+
+                    const {
+                        error: classError
+                    } = await supabaseClient
+                        .from("class_students")
+                        .insert({
+                            class_id: classId,
+                            student_id: insertedStudent.id,
+                            enrollment_date:
+                                document
+                                    .getElementById("studentEnrollmentDate")
+                                    .value || null
+                        });
+
+                    if (classError) {
+                        await supabaseClient
+                            .from("students")
+                            .delete()
+                            .eq("id", insertedStudent.id);
+
+                        throw classError;
                     }
 
 
