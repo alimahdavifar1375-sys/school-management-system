@@ -2120,6 +2120,279 @@
 
 
     /* =========================================================
+       TEACHERS MANAGEMENT
+       ========================================================= */
+
+    let allSchoolTeachers = [];
+    let allAssignments = [];
+    let assignmentClasses = [];
+    let assignmentSubjects = [];
+    let assignmentTeachers = [];
+
+    const teacherModal = document.getElementById("teacherModal");
+    const teacherForm = document.getElementById("teacherForm");
+
+    function teacherDisplayName(t) {
+        return [t.first_name, t.last_name].filter(Boolean).join(" ").trim() || "بدون نام";
+    }
+
+    function renderTeachers(teachers) {
+        const body = document.getElementById("teachersTableBody");
+        const count = document.getElementById("teachersCount");
+        count.textContent = `${teachers.length} معلم`;
+
+        if (!teachers.length) {
+            body.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="icon">👨‍🏫</div><div>هنوز معلمی ثبت نشده است.</div><div style="margin-top:7px;font-size:10px;">از «افزودن معلم» استفاده کنید.</div></div></td></tr>`;
+            return;
+        }
+
+        body.innerHTML = teachers.map((t, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>
+                    <div class="teacher-name">${escapeHtml(teacherDisplayName(t))}</div>
+                    <div class="teacher-meta">${escapeHtml(t.user_id || "")}</div>
+                </td>
+                <td>${escapeHtml(t.employee_code || "—")}</td>
+                <td>${escapeHtml(t.hire_date || "—")}</td>
+            </tr>
+        `).join("");
+    }
+
+    async function loadTeachers() {
+        const body = document.getElementById("teachersTableBody");
+        const count = document.getElementById("teachersCount");
+        body.innerHTML = `<tr><td colspan="4"><div class="empty-state">در حال دریافت معلمان...</div></td></tr>`;
+        count.textContent = "در حال دریافت...";
+        hideMessage(document.getElementById("teachersPageMessage"));
+
+        const { data, error } = await supabaseClient.rpc("get_my_school_teachers");
+        if (error) {
+            console.error("get_my_school_teachers:", error);
+            body.innerHTML = `<tr><td colspan="4"><div class="empty-state">دریافت معلمان با خطا مواجه شد.</div></td></tr>`;
+            count.textContent = "خطا";
+            showMessage(document.getElementById("teachersPageMessage"), "دریافت معلمان انجام نشد: " + error.message, "error");
+            return;
+        }
+
+        allSchoolTeachers = data || [];
+        renderTeachers(allSchoolTeachers);
+    }
+
+    function openTeacherModal() {
+        teacherForm.reset();
+        hideMessage(document.getElementById("teacherFormMessage"));
+        teacherModal.classList.add("open");
+        setTimeout(() => document.getElementById("teacherFirstName").focus(), 50);
+    }
+
+    function closeTeacherModal() {
+        teacherModal.classList.remove("open");
+        teacherForm.reset();
+        hideMessage(document.getElementById("teacherFormMessage"));
+    }
+
+    document.getElementById("addTeacherButton").addEventListener("click", openTeacherModal);
+    document.getElementById("closeTeacherModal").addEventListener("click", closeTeacherModal);
+    document.getElementById("cancelTeacherButton").addEventListener("click", closeTeacherModal);
+    document.getElementById("refreshTeachersButton").addEventListener("click", async function () {
+        this.disabled = true;
+        try {
+            await Promise.all([loadTeachers(), loadAssignmentData()]);
+        } finally {
+            this.disabled = false;
+        }
+    });
+    teacherModal.addEventListener("click", function (e) {
+        if (e.target === teacherModal) closeTeacherModal();
+    });
+
+    teacherForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const button = document.getElementById("saveTeacherButton");
+        const message = document.getElementById("teacherFormMessage");
+
+        const firstName = document.getElementById("teacherFirstName").value.trim();
+        const lastName = document.getElementById("teacherLastName").value.trim();
+        const email = document.getElementById("teacherEmail").value.trim().toLowerCase();
+        const password = document.getElementById("teacherPassword").value;
+        const employeeCode = document.getElementById("teacherEmployeeCode").value.trim() || null;
+        const hireDate = document.getElementById("teacherHireDate").value || null;
+
+        if (!firstName || !lastName || !email || !password) {
+            showMessage(message, "نام، نام خانوادگی، ایمیل و رمز عبور الزامی است.", "error");
+            return;
+        }
+        if (password.length < 6) {
+            showMessage(message, "رمز عبور باید حداقل ۶ کاراکتر باشد.", "error");
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "در حال ایجاد حساب...";
+        hideMessage(message);
+
+        try {
+            const { data, error } = await supabaseClient.rpc("create_teacher_account", {
+                p_email: email,
+                p_password: password,
+                p_first_name: firstName,
+                p_last_name: lastName,
+                p_employee_code: employeeCode,
+                p_hire_date: hireDate
+            });
+
+            if (error) throw error;
+
+            closeTeacherModal();
+            showMessage(document.getElementById("teachersPageMessage"), "حساب معلم با موفقیت ایجاد شد.", "success");
+            await loadTeachers();
+            await loadAssignmentData();
+            console.log("Teacher created:", data);
+        } catch (err) {
+            console.error("create_teacher_account:", err);
+            showMessage(message, "ایجاد حساب معلم انجام نشد: " + err.message, "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = "💾 ایجاد حساب معلم";
+        }
+    });
+
+    function fillSelect(selectId, items, placeholder, getLabel) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>` + items.map(item =>
+            `<option value="${escapeHtml(item.id)}">${escapeHtml(getLabel(item))}</option>`
+        ).join("");
+        select.disabled = false;
+    }
+
+    async function loadAssignmentData() {
+        const classSelect = document.getElementById("assignmentClass");
+        const subjectSelect = document.getElementById("assignmentSubject");
+        const teacherSelect = document.getElementById("assignmentTeacher");
+
+        classSelect.disabled = true;
+        subjectSelect.disabled = true;
+        teacherSelect.disabled = true;
+        classSelect.innerHTML = `<option value="">در حال دریافت کلاس‌ها...</option>`;
+        subjectSelect.innerHTML = `<option value="">در حال دریافت دروس...</option>`;
+        teacherSelect.innerHTML = `<option value="">در حال دریافت معلمان...</option>`;
+
+        const [classesResult, subjectsResult, teachersResult, assignmentsResult] = await Promise.all([
+            supabaseClient.rpc("get_my_school_classes"),
+            supabaseClient.rpc("get_my_school_subjects"),
+            supabaseClient.rpc("get_my_school_teachers"),
+            supabaseClient.rpc("get_my_class_subject_assignments")
+        ]);
+
+        const firstError = [classesResult, subjectsResult, teachersResult, assignmentsResult].find(x => x.error)?.error;
+        if (firstError) {
+            console.error("loadAssignmentData:", firstError);
+            showMessage(document.getElementById("assignmentMessage"), "دریافت اطلاعات تخصیص انجام نشد: " + firstError.message, "error");
+        }
+
+        assignmentClasses = classesResult.data || [];
+        assignmentSubjects = subjectsResult.data || [];
+        assignmentTeachers = teachersResult.data || [];
+        allAssignments = assignmentsResult.data || [];
+
+        fillSelect("assignmentClass", assignmentClasses, "انتخاب کلاس", x =>
+            [x.name, x.grade, x.section].filter(Boolean).join(" — ")
+        );
+        fillSelect("assignmentSubject", assignmentSubjects, "انتخاب درس", x =>
+            `${x.name}${x.units != null ? ` — ${x.units} واحد` : ""}`
+        );
+        fillSelect("assignmentTeacher", assignmentTeachers, "بدون معلم", teacherDisplayName);
+        teacherSelect.value = "";
+
+        renderAssignments(allAssignments);
+    }
+
+    function renderAssignments(assignments) {
+        const body = document.getElementById("assignmentsTableBody");
+        if (!assignments.length) {
+            body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">🔗</div><div>هنوز تخصیصی ثبت نشده است.</div></div></td></tr>`;
+            return;
+        }
+        body.innerHTML = assignments.map((a, i) => {
+            const teacher = [a.teacher_first_name, a.teacher_last_name].filter(Boolean).join(" ") || "بدون معلم";
+            return `<tr>
+                <td>${i + 1}</td>
+                <td>${escapeHtml(a.class_name || "—")}</td>
+                <td>${escapeHtml(a.subject_name || "—")}</td>
+                <td>${escapeHtml(teacher)}</td>
+                <td>${a.weekly_hours == null ? "—" : escapeHtml(String(a.weekly_hours))}</td>
+            </tr>`;
+        }).join("");
+    }
+
+    document.getElementById("assignmentForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const button = document.getElementById("saveAssignmentButton");
+        const message = document.getElementById("assignmentMessage");
+        const classId = document.getElementById("assignmentClass").value;
+        const subjectId = document.getElementById("assignmentSubject").value;
+        const teacherId = document.getElementById("assignmentTeacher").value || null;
+        const rawHours = document.getElementById("assignmentHours").value.trim();
+        const hours = rawHours === "" ? null : Number(rawHours);
+
+        if (!classId || !subjectId) {
+            showMessage(message, "انتخاب کلاس و درس الزامی است.", "error");
+            return;
+        }
+        if (hours !== null && (!Number.isFinite(hours) || hours < 0)) {
+            showMessage(message, "ساعات هفتگی باید عددی صفر یا بیشتر باشد.", "error");
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "در حال ذخیره...";
+        hideMessage(message);
+        try {
+            const { error } = await supabaseClient.rpc("assign_teacher_to_class_subject", {
+                p_class_id: classId,
+                p_subject_id: subjectId,
+                p_teacher_id: teacherId,
+                p_weekly_hours: hours
+            });
+            if (error) throw error;
+            showMessage(message, "تخصیص با موفقیت ذخیره شد.", "success");
+            document.getElementById("assignmentHours").value = "";
+            document.getElementById("assignmentTeacher").value = "";
+            const result = await supabaseClient.rpc("get_my_class_subject_assignments");
+            if (result.error) throw result.error;
+            allAssignments = result.data || [];
+            renderAssignments(allAssignments);
+        } catch (err) {
+            console.error("assign_teacher_to_class_subject:", err);
+            showMessage(message, "ذخیره تخصیص انجام نشد: " + err.message, "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = "💾 ذخیره تخصیص";
+        }
+    });
+
+    document.getElementById("teacherSearchInput").addEventListener("input", function () {
+        const q = this.value.trim().toLowerCase();
+        if (!q) {
+            renderTeachers(allSchoolTeachers);
+            return;
+        }
+        renderTeachers(allSchoolTeachers.filter(t =>
+            [t.first_name, t.last_name, t.employee_code, t.hire_date, t.user_id]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase()
+                .includes(q)
+        ));
+    });
+
+    teacherModal.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closeTeacherModal();
+    });
+
+
+    /* =========================================================
        CLASSES MANAGEMENT
        ========================================================= */
 
