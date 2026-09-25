@@ -3379,58 +3379,196 @@
         const studentId = document.getElementById("reportCardStudent").value;
         const body = document.getElementById("reportCardBody");
         const summary = document.getElementById("reportCardSummary");
+
         if (!classId || !studentId) {
             showMessage(document.getElementById("reportCardMessage"), "ابتدا کلاس و دانش‌آموز را انتخاب کنید.", "error");
             return;
         }
+
         body.innerHTML = `<tr><td colspan="6"><div class="empty-state">در حال تولید کارنامه...</div></td></tr>`;
         hideMessage(document.getElementById("reportCardMessage"));
+
         try {
             const [reportResult, averageResult] = await Promise.all([
-                supabaseClient.rpc("get_student_report_card", { p_student_id: studentId, p_class_id: classId }),
-                supabaseClient.rpc("calculate_student_weighted_average", { p_student_id: studentId, p_class_id: classId })
+                supabaseClient.rpc("get_student_report_card", {
+                    p_student_id: studentId,
+                    p_class_id: classId
+                }),
+                supabaseClient.rpc("calculate_student_weighted_average", {
+                    p_student_id: studentId,
+                    p_class_id: classId
+                })
             ]);
+
             if (reportResult.error) throw reportResult.error;
             if (averageResult.error) throw averageResult.error;
-            const rows = reportResult.data || [];
+
+            const reportRows = reportResult.data || [];
             const averages = averageResult.data || [];
-            const avgMap = new Map(averages.map(x => [x.class_subject_id, Number(x.average_score)]));
-            const unitsMap = new Map(averages.map(x => [x.class_subject_id, Number(x.units || 0)]));
-            const weightedMap = new Map(averages.map(x => [x.class_subject_id, Number(x.weighted_score || 0)]));
-            const overall = averages.length && averages.some(x => x.overall_average != null)
-                ? Number(averages.find(x => x.overall_average != null).overall_average).toFixed(2)
+
+            /*
+             * get_student_report_card تمام دروس کلاس را برمی‌گرداند،
+             * حتی اگر برای دانش‌آموز نمره‌ای ثبت نشده باشد.
+             * بنابراین لیست کارنامه را از reportRows می‌سازیم،
+             * نه فقط از averages.
+             */
+            const subjectMap = new Map();
+
+            reportRows.forEach(row => {
+                if (!subjectMap.has(row.class_subject_id)) {
+                    subjectMap.set(row.class_subject_id, {
+                        class_subject_id: row.class_subject_id,
+                        subject_name: row.subject_name || "—",
+                        units: 0,
+                        grades: []
+                    });
+                }
+
+                const subject = subjectMap.get(row.class_subject_id);
+
+                if (row.max_score != null) {
+                    subject.grades.push(row);
+                }
+            });
+
+            /*
+             * اگر به هر دلیل reportRows برای یک درس خالی باشد ولی تابع
+             * میانگین آن درس را برگرداند، آن درس را هم حفظ می‌کنیم.
+             */
+            averages.forEach(row => {
+                if (!subjectMap.has(row.class_subject_id)) {
+                    subjectMap.set(row.class_subject_id, {
+                        class_subject_id: row.class_subject_id,
+                        subject_name: row.subject_name || "—",
+                        units: 0,
+                        grades: []
+                    });
+                }
+            });
+
+            const avgMap = new Map(
+                averages.map(x => [x.class_subject_id, x])
+            );
+
+            const subjectRows = Array.from(subjectMap.values())
+                .map((subject, index) => {
+                    const average = avgMap.get(subject.class_subject_id);
+                    const units = average
+                        ? Number(average.units || 0)
+                        : Number(subject.units || 0);
+
+                    return {
+                        ...subject,
+                        index: index + 1,
+                        units,
+                        average_score: average?.average_score != null
+                            ? Number(average.average_score)
+                            : null,
+                        weighted_score: average?.weighted_score != null
+                            ? Number(average.weighted_score)
+                            : null
+                    };
+                })
+                .sort((a, b) =>
+                    String(a.subject_name).localeCompare(
+                        String(b.subject_name),
+                        'fa'
+                    )
+                )
+                .map((row, index) => ({
+                    ...row,
+                    index: index + 1
+                }));
+
+            const gradedSubjects = subjectRows.filter(
+                row => row.average_score != null
+            );
+
+            const overallRow = averages.find(
+                x => x.overall_average != null
+            );
+
+            const overall = overallRow
+                ? Number(overallRow.overall_average).toFixed(2)
                 : "—";
-            const subjectRows = averages.map((a, i) => ({
-                ...a,
-                index: i + 1,
-                average_score: Number(a.average_score),
-                units: Number(a.units || 0),
-                weighted_score: Number(a.weighted_score || 0)
-            }));
-            summary.innerHTML = `<span class="summary-badge">میانگین کلِ وزنی: ${overall}</span><span class="summary-badge">تعداد درس: ${averages.length}</span><span class="summary-badge">مجموع واحد: ${averages.reduce((sum, x) => sum + Number(x.units || 0), 0)}</span>`;
+
+            const totalUnits = subjectRows.reduce(
+                (sum, row) => sum + Number(row.units || 0),
+                0
+            );
+
+            const gradedUnits = gradedSubjects.reduce(
+                (sum, row) => sum + Number(row.units || 0),
+                0
+            );
+
+            summary.innerHTML = `
+                <span class="summary-badge">میانگین کل وزنی: ${overall}</span>
+                <span class="summary-badge">تعداد دروس: ${subjectRows.length}</span>
+                <span class="summary-badge">دروس دارای نمره: ${gradedSubjects.length}</span>
+                <span class="summary-badge">مجموع واحدها: ${totalUnits}</span>
+                <span class="summary-badge">واحدهای محاسبه‌شده: ${gradedUnits}</span>
+            `;
+
             if (!subjectRows.length) {
-                body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📄</div><div>برای این دانش‌آموز هنوز نمره‌ای ثبت نشده است.</div></div></td></tr>`;
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="icon">📄</div>
+                                <div>برای این کلاس درسی ثبت نشده است.</div>
+                            </div>
+                        </td>
+                    </tr>`;
                 return;
             }
-            body.innerHTML = subjectRows.map(r => {
-                const gradeDetails = rows
-                    .filter(x => x.class_subject_id === r.class_subject_id)
-                    .map(x => `${escapeHtml(x.grade_type_name || "نمره")} : <strong>${escapeHtml(x.score ?? "—")}</strong>/${escapeHtml(x.max_score ?? "—")}`)
-                    .join("<br>");
+
+            body.innerHTML = subjectRows.map(row => {
+                const gradeDetails = row.grades.length
+                    ? row.grades.map(x => `
+                        <div style="margin-bottom:4px">
+                            ${escapeHtml(x.grade_type_name || "نمره")}:
+                            <strong>${escapeHtml(x.score ?? "—")}</strong>
+                            / ${escapeHtml(x.max_score ?? "—")}
+                            ${x.grade_date ? ` <small>(${escapeHtml(x.grade_date)})</small>` : ""}
+                        </div>
+                    `).join("")
+                    : `<span style="color:#888">هنوز نمره‌ای ثبت نشده</span>`;
+
                 return `
                     <tr>
-                        <td>${r.index}</td>
-                        <td><strong>${escapeHtml(r.subject_name || "—")}</strong></td>
-                        <td>${escapeHtml(r.units)}</td>
-                        <td>${gradeDetails || "—"}</td>
-                        <td><strong>${Number.isFinite(r.average_score) ? r.average_score.toFixed(2) : "—"}</strong></td>
-                        <td>${Number.isFinite(r.weighted_score) ? r.weighted_score.toFixed(2) : "—"}</td>
+                        <td>${row.index}</td>
+                        <td><strong>${escapeHtml(row.subject_name)}</strong></td>
+                        <td>${escapeHtml(row.units)}</td>
+                        <td>${gradeDetails}</td>
+                        <td>
+                            <strong>
+                                ${row.average_score != null
+                                    ? row.average_score.toFixed(2)
+                                    : "—"}
+                            </strong>
+                        </td>
+                        <td>
+                            ${row.weighted_score != null
+                                ? row.weighted_score.toFixed(2)
+                                : "—"}
+                        </td>
                     </tr>`;
             }).join("");
+
         } catch (error) {
             console.error("report card:", error);
-            body.innerHTML = `<tr><td colspan="6"><div class="empty-state">دریافت کارنامه انجام نشد.</div></td></tr>`;
-            showMessage(document.getElementById("reportCardMessage"), "دریافت کارنامه انجام نشد: " + error.message, "error");
+            body.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">دریافت کارنامه انجام نشد.</div>
+                    </td>
+                </tr>`;
+            showMessage(
+                document.getElementById("reportCardMessage"),
+                "دریافت کارنامه انجام نشد: " + error.message,
+                "error"
+            );
         }
     }
 
