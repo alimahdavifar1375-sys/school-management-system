@@ -525,6 +525,168 @@
             }
         }
 
+
+        /* =========================
+           STUDENTS MANAGEMENT
+           ========================= */
+        .module-page {
+            display: none;
+        }
+
+        .module-page.active {
+            display: block;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .page-header h2 {
+            margin: 0 0 5px;
+            font-size: 21px;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .secondary-button {
+            width: auto;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 10px 15px;
+            font-size: 12px;
+        }
+
+        .students-toolbar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 14px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .students-search {
+            flex: 1;
+            min-width: 220px;
+            margin: 0;
+        }
+
+        .students-count {
+            color: #64748b;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .students-table-wrap {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            overflow: auto;
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        .students-table th,
+        .students-table td {
+            padding: 13px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: right;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .students-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 800;
+        }
+
+        .students-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .student-name-cell {
+            font-weight: 700;
+        }
+
+        .student-sub {
+            color: #94a3b8;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .status-active {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .status-inactive {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 20px;
+            color: #64748b;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .loading-row {
+            text-align: center !important;
+            color: #64748b;
+            padding: 30px !important;
+        }
+
+        @media (max-width: 650px) {
+            .page-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .students-toolbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .students-search {
+                min-width: 0;
+            }
+        }
+
     </style>
 </head>
 
@@ -760,6 +922,67 @@
                 <main class="dashboard-main">
 
                     <div id="dashboardMessage" class="message"></div>
+
+
+                    <!-- STUDENTS MANAGEMENT PAGE -->
+                    <section id="studentsPage" class="module-page">
+
+                        <div class="page-header">
+                            <div>
+                                <h2>👨‍🎓 مدیریت دانش‌آموزان</h2>
+                                <p>مشاهده و جستجوی دانش‌آموزان مدرسه</p>
+                            </div>
+
+                            <div class="page-actions">
+                                <button id="refreshStudentsButton" class="secondary-button">
+                                    🔄 بروزرسانی
+                                </button>
+                                <button id="addStudentButton" class="secondary-button">
+                                    ➕ افزودن دانش‌آموز
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="studentsPageMessage" class="message"></div>
+
+                        <div class="students-toolbar">
+                            <input
+                                id="studentSearchInput"
+                                class="students-search"
+                                type="text"
+                                placeholder="جستجو بر اساس نام، نام خانوادگی، کد ملی یا شماره موبایل..."
+                            >
+
+                            <div id="studentsCount" class="students-count">
+                                در حال دریافت اطلاعات...
+                            </div>
+                        </div>
+
+                        <div class="students-table-wrap">
+
+                            <table class="students-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>دانش‌آموز</th>
+                                        <th>کد ملی</th>
+                                        <th>موبایل</th>
+                                        <th>وضعیت</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="studentsTableBody">
+                                    <tr>
+                                        <td colspan="5" class="loading-row">
+                                            در حال دریافت دانش‌آموزان...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </section>
 
                     <section id="dashboardHome">
 
@@ -1426,7 +1649,12 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
 
             const moduleName = item.getAttribute("data-module");
 
+            document.querySelectorAll(".module-page").forEach(function(page) {
+                page.classList.remove("active");
+            });
+
             if (moduleName === "dashboard") {
+
                 document.getElementById("dashboardHome").classList.remove("hidden");
 
                 document.querySelectorAll(".nav-item").forEach(function(nav) {
@@ -1440,12 +1668,20 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
                 return;
             }
 
+            document.getElementById("dashboardHome").classList.add("hidden");
+
             document.querySelectorAll(".nav-item").forEach(function(nav) {
                 nav.classList.remove("active");
             });
 
             const matchingNav = document.querySelector('.nav-item[data-module="' + moduleName + '"]');
             if (matchingNav) matchingNav.classList.add("active");
+
+            if (moduleName === "students") {
+                document.getElementById("studentsPage").classList.add("active");
+                loadStudents();
+                return;
+            }
 
             showMessage(
                 document.getElementById("dashboardMessage"),
@@ -1477,6 +1713,245 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
 
 
     // =========================================================
+    // STUDENTS MANAGEMENT
+    // =========================================================
+
+    let allStudents = [];
+
+
+    async function loadStudents() {
+
+        const tableBody =
+            document.getElementById("studentsTableBody");
+
+        const countElement =
+            document.getElementById("studentsCount");
+
+        tableBody.innerHTML =
+            '<tr><td colspan="5" class="loading-row">در حال دریافت دانش‌آموزان...</td></tr>';
+
+        countElement.textContent = "در حال دریافت اطلاعات...";
+
+        const {
+            data: students,
+            error: studentsError
+        } = await supabaseClient
+            .from("students")
+            .select("id, user_id, school_id")
+            .order("id");
+
+        if (studentsError) {
+
+            console.error(studentsError);
+
+            tableBody.innerHTML =
+                '<tr><td colspan="5" class="loading-row">دریافت دانش‌آموزان با خطا مواجه شد.</td></tr>';
+
+            countElement.textContent = "خطا در دریافت اطلاعات";
+
+            showMessage(
+                document.getElementById("studentsPageMessage"),
+                "خطا در دریافت لیست دانش‌آموزان. دسترسی دیتابیس را بررسی کنید.",
+                "error"
+            );
+
+            return;
+        }
+
+        allStudents = students || [];
+
+        if (!allStudents.length) {
+            renderStudents([]);
+            return;
+        }
+
+        const userIds = allStudents
+            .map(function(student) {
+                return student.user_id;
+            })
+            .filter(Boolean);
+
+        let profiles = [];
+
+        if (userIds.length) {
+
+            const {
+                data: profileData,
+                error: profilesError
+            } = await supabaseClient
+                .from("profiles")
+                .select("id, first_name, last_name, mobile, national_code, is_active")
+                .in("id", userIds);
+
+            if (profilesError) {
+                console.error(profilesError);
+            } else {
+                profiles = profileData || [];
+            }
+        }
+
+        const profileMap = {};
+
+        profiles.forEach(function(profile) {
+            profileMap[profile.id] = profile;
+        });
+
+        allStudents = allStudents.map(function(student) {
+
+            const profile =
+                profileMap[student.user_id] || {};
+
+            return {
+                ...student,
+                first_name: profile.first_name || "—",
+                last_name: profile.last_name || "",
+                mobile: profile.mobile || "—",
+                national_code: profile.national_code || "—",
+                is_active: profile.is_active !== false
+            };
+
+        });
+
+        renderStudents(allStudents);
+
+        hideMessage(
+            document.getElementById("studentsPageMessage")
+        );
+    }
+
+
+    function renderStudents(students) {
+
+        const tableBody =
+            document.getElementById("studentsTableBody");
+
+        const countElement =
+            document.getElementById("studentsCount");
+
+        countElement.textContent =
+            students.length + " دانش‌آموز";
+
+        if (!students.length) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <div class="empty-icon">👨‍🎓</div>
+                            <div>دانش‌آموزی مطابق جستجو پیدا نشد.</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        tableBody.innerHTML = students.map(function(student, index) {
+
+            const fullName =
+                ((student.first_name || "") + " " + (student.last_name || "")).trim()
+                || "بدون نام";
+
+            const statusClass =
+                student.is_active
+                    ? "status-active"
+                    : "status-inactive";
+
+            const statusText =
+                student.is_active
+                    ? "فعال"
+                    : "غیرفعال";
+
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+
+                    <td>
+                        <div class="student-name-cell">${escapeHtml(fullName)}</div>
+                        <div class="student-sub">${escapeHtml(student.user_id || "بدون حساب کاربری")}</div>
+                    </td>
+
+                    <td>${escapeHtml(student.national_code)}</td>
+
+                    <td>${escapeHtml(student.mobile)}</td>
+
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                </tr>
+            `;
+
+        }).join("");
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+
+    function filterStudents() {
+
+        const query =
+            document.getElementById("studentSearchInput")
+                .value
+                .trim()
+                .toLowerCase();
+
+        if (!query) {
+            renderStudents(allStudents);
+            return;
+        }
+
+        const filtered =
+            allStudents.filter(function(student) {
+
+                const text = [
+                    student.first_name,
+                    student.last_name,
+                    student.national_code,
+                    student.mobile
+                ]
+                .join(" ")
+                .toLowerCase();
+
+                return text.includes(query);
+            });
+
+        renderStudents(filtered);
+    }
+
+
+    document.getElementById("studentSearchInput")
+        .addEventListener("input", filterStudents);
+
+
+    document.getElementById("refreshStudentsButton")
+        .addEventListener("click", loadStudents);
+
+
+    document.getElementById("addStudentButton")
+        .addEventListener("click", function() {
+
+            showMessage(
+                document.getElementById("studentsPageMessage"),
+                "فرم افزودن دانش‌آموز را در مرحله بعد می‌سازیم؛ ابتدا لیست دانش‌آموزان را کامل و پایدار می‌کنیم.",
+                "info"
+            );
+
+        });
+
+
+        // =========================================================
     // INITIAL SESSION CHECK
     // =========================================================
 
