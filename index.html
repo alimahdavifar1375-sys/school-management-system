@@ -2663,7 +2663,7 @@
 
     function setDisciplineSelect(select, items, placeholder, labelFn) {
         select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>` +
-            items.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(labelFn(item))}</option>`).join("");
+            items.map(item => { const itemId = item.id ?? item.student_id; return `<option value="${escapeHtml(itemId)}">${escapeHtml(labelFn(item))}</option>`; }).join("");
         select.disabled = false;
     }
 
