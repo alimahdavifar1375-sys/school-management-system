@@ -608,6 +608,23 @@
         }
 
         /* =====================================================
+           CLASSES MANAGEMENT
+           ===================================================== */
+
+        .classes-table { min-width: 820px; }
+        .class-name { font-weight: 800; }
+        .class-meta { margin-top: 3px; color: #94a3b8; font-size: 9px; }
+        .class-capacity { color: #475569; font-weight: 700; }
+        .class-modal-card { width: min(620px, 100%); }
+        .class-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .class-form-grid .full { grid-column: 1 / -1; }
+        .class-form-grid .form-group { margin-bottom: 0; }
+        .class-form-grid select { width: 100%; height: 46px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 11px; background: #fff; color: #0f172a; outline: none; font-family: inherit; font-size: 13px; }
+        .class-form-grid select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+        .class-help { margin-top: 6px; color: #64748b; font-size: 10px; line-height: 1.8; }
+        @media (max-width: 600px) { .class-form-grid { grid-template-columns: 1fr; } .class-form-grid .full { grid-column: auto; } }
+
+        /* =====================================================
            OTHER MODULE PLACEHOLDER
            ===================================================== */
 
@@ -1378,6 +1395,32 @@
                     </section>
 
 
+                    <!-- CLASSES -->
+                    <section id="classesPage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>🏫 مدیریت کلاس‌ها</h2>
+                                <p>ساخت، ویرایش و مدیریت کلاس‌های مدرسه بدون ورود دستی از داخل دیتابیس</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshClassesButton" class="small-btn">🔄 بروزرسانی</button>
+                                <button id="addClassButton" class="small-btn">➕ افزودن کلاس</button>
+                            </div>
+                        </div>
+                        <div id="classesPageMessage" class="message"></div>
+                        <div class="toolbar">
+                            <input id="classSearchInput" type="search" placeholder="جستجو بر اساس نام کلاس، پایه یا بخش...">
+                            <div id="classesCount" class="count">در حال دریافت...</div>
+                        </div>
+                        <div class="table-card"><div class="table-scroll">
+                            <table class="classes-table">
+                                <thead><tr><th>#</th><th>کلاس</th><th>پایه</th><th>بخش</th><th>سال تحصیلی</th><th>ظرفیت</th><th>دانش‌آموزان</th><th>عملیات</th></tr></thead>
+                                <tbody id="classesTableBody"><tr><td colspan="8"><div class="empty-state">در حال دریافت کلاس‌ها...</div></td></tr></tbody>
+                            </table>
+                        </div></div>
+                    </section>
+
+
                     <!-- OTHER MODULES -->
                     <section id="otherModulePage" class="module-page">
 
@@ -1405,6 +1448,36 @@
         </div>
 
     </section>
+
+
+    <!-- =====================================================
+         CLASS ADD / EDIT MODAL
+         ===================================================== -->
+    <div id="classModal" class="modal-overlay">
+        <div class="modal-card class-modal-card">
+            <div class="modal-header">
+                <h3 id="classModalTitle">➕ افزودن کلاس</h3>
+                <button id="closeClassModal" class="modal-close" type="button">×</button>
+            </div>
+            <form id="classForm">
+                <div class="modal-body">
+                    <div id="classFormMessage" class="message"></div>
+                    <div class="class-form-grid">
+                        <div class="form-group full">
+                            <label for="classAcademicYear">سال تحصیلی <span class="required">*</span></label>
+                            <select id="classAcademicYear" required><option value="">در حال دریافت...</option></select>
+                            <div class="class-help">کلاس به سال تحصیلی انتخاب‌شده متصل می‌شود.</div>
+                        </div>
+                        <div class="form-group"><label for="className">نام کلاس <span class="required">*</span></label><input id="className" type="text" required maxlength="100" placeholder="مثلاً کلاس اول الف"></div>
+                        <div class="form-group"><label for="classGrade">پایه</label><input id="classGrade" type="text" maxlength="50" placeholder="مثلاً اول"></div>
+                        <div class="form-group"><label for="classSection">بخش / شعبه</label><input id="classSection" type="text" maxlength="50" placeholder="مثلاً الف"></div>
+                        <div class="form-group"><label for="classCapacity">ظرفیت</label><input id="classCapacity" type="number" min="1" max="1000" placeholder="مثلاً 30"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button id="cancelClassButton" type="button" class="small-btn">انصراف</button><button id="saveClassButton" type="submit" class="small-btn success">💾 ذخیره کلاس</button></div>
+            </form>
+        </div>
+    </div>
 
 
     <!-- =====================================================
@@ -1860,11 +1933,15 @@
         const studentsPage =
             document.getElementById("studentsPage");
 
+        const classesPage =
+            document.getElementById("classesPage");
+
         const otherPage =
             document.getElementById("otherModulePage");
 
         home.classList.add("hidden");
         studentsPage.classList.remove("active");
+        classesPage.classList.remove("active");
         otherPage.classList.remove("active");
 
         document
@@ -1899,6 +1976,12 @@
                 console.error("دریافت کلاس‌ها انجام نشد:", error);
             });
 
+            return;
+        }
+
+        if (moduleName === "classes") {
+            classesPage.classList.add("active");
+            loadClasses();
             return;
         }
 
@@ -1937,6 +2020,148 @@
             });
 
         });
+
+
+    /* =========================================================
+       CLASSES MANAGEMENT
+       ========================================================= */
+
+    let allSchoolClasses = [];
+    let classYears = [];
+    let classYearMap = {};
+    let classStudentCount = {};
+    let editingClassId = null;
+
+    const classModal = document.getElementById("classModal");
+    const classForm = document.getElementById("classForm");
+
+    async function loadAcademicYearsForClass(selectedId = "") {
+        const select = document.getElementById("classAcademicYear");
+        select.disabled = true;
+        select.innerHTML = `<option value="">در حال دریافت سال‌های تحصیلی...</option>`;
+        const { data, error } = await supabaseClient.from("academic_years")
+            .select("id, title, start_date, end_date, is_active, created_at")
+            .order("start_date", { ascending: false, nullsFirst: false })
+            .order("created_at", { ascending: false });
+        if (error) throw error;
+        classYears = data || [];
+        select.innerHTML = classYears.length ? `<option value="">انتخاب سال تحصیلی</option>${classYears.map(y => `<option value="${escapeHtml(y.id)}">${escapeHtml(y.title)}${y.is_active ? " — فعال" : ""}</option>`).join("")}` : `<option value="">هیچ سال تحصیلی ثبت نشده است</option>`;
+        const active = classYears.find(y => y.is_active);
+        select.value = selectedId || active?.id || classYears[0]?.id || "";
+        select.disabled = false;
+    }
+
+    async function loadClasses() {
+        const body = document.getElementById("classesTableBody");
+        const count = document.getElementById("classesCount");
+        body.innerHTML = `<tr><td colspan="8"><div class="empty-state">در حال دریافت کلاس‌ها...</div></td></tr>`;
+        count.textContent = "در حال دریافت...";
+        hideMessage(document.getElementById("classesPageMessage"));
+
+        const { data, error } = await supabaseClient.from("classes")
+            .select("id, school_id, academic_year_id, name, grade, section, capacity, created_at")
+            .order("grade", { ascending: true, nullsFirst: false })
+            .order("name", { ascending: true })
+            .order("section", { ascending: true, nullsFirst: false });
+        if (error) {
+            body.innerHTML = `<tr><td colspan="8"><div class="empty-state">دریافت کلاس‌ها با خطا مواجه شد.</div></td></tr>`;
+            count.textContent = "خطا";
+            showMessage(document.getElementById("classesPageMessage"), "دریافت کلاس‌ها انجام نشد: " + error.message, "error");
+            return;
+        }
+        allSchoolClasses = data || [];
+        classYearMap = {};
+        const yearIds = [...new Set(allSchoolClasses.map(x => x.academic_year_id).filter(Boolean))];
+        if (yearIds.length) {
+            const y = await supabaseClient.from("academic_years").select("id,title,is_active").in("id", yearIds);
+            (y.data || []).forEach(x => classYearMap[x.id] = x);
+        }
+        classStudentCount = {};
+        const classIds = allSchoolClasses.map(x => x.id);
+        if (classIds.length) {
+            const m = await supabaseClient.from("class_students").select("class_id,student_id").in("class_id", classIds);
+            (m.data || []).forEach(x => classStudentCount[x.class_id] = (classStudentCount[x.class_id] || 0) + 1);
+        }
+        renderClasses(allSchoolClasses);
+    }
+
+    function renderClasses(classes) {
+        const body = document.getElementById("classesTableBody");
+        document.getElementById("classesCount").textContent = `${classes.length} کلاس`;
+        if (!classes.length) {
+            body.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🏫</div><div>هنوز کلاسی ثبت نشده است.</div><div style="margin-top:7px;font-size:10px;">از «افزودن کلاس» استفاده کنید.</div></div></td></tr>`;
+            return;
+        }
+        body.innerHTML = classes.map((x,i) => {
+            const year = classYearMap[x.academic_year_id];
+            const n = classStudentCount[x.id] || 0;
+            const meta = [x.grade,x.section].filter(Boolean).join(" — ");
+            return `<tr><td>${i+1}</td><td><div class="class-name">${escapeHtml(x.name || "—")}</div>${meta ? `<div class="class-meta">${escapeHtml(meta)}</div>` : ""}</td><td>${escapeHtml(x.grade || "—")}</td><td>${escapeHtml(x.section || "—")}</td><td>${escapeHtml(year?.title || "—")}</td><td><span class="class-capacity">${x.capacity || "—"}</span></td><td>${n}${x.capacity ? " / " + x.capacity : ""}</td><td><div class="student-actions"><button class="row-action edit" type="button" data-edit-class="${escapeHtml(x.id)}">ویرایش</button><button class="row-action disable" type="button" data-delete-class="${escapeHtml(x.id)}">حذف</button></div></td></tr>`;
+        }).join("");
+        body.querySelectorAll("[data-edit-class]").forEach(btn => btn.addEventListener("click", () => { const x=allSchoolClasses.find(c=>String(c.id)===String(btn.dataset.editClass)); if(x) openClassModal(x); }));
+        body.querySelectorAll("[data-delete-class]").forEach(btn => btn.addEventListener("click", async () => {
+            const x=allSchoolClasses.find(c=>String(c.id)===String(btn.dataset.deleteClass)); if(!x) return;
+            if(!window.confirm(`آیا کلاس «${x.name}» حذف شود؟`)) return;
+            btn.disabled=true;
+            const { error }=await supabaseClient.from("classes").delete().eq("id",x.id);
+            if(error){ showMessage(document.getElementById("classesPageMessage"),"حذف کلاس انجام نشد: "+error.message,"error"); btn.disabled=false; return; }
+            showMessage(document.getElementById("classesPageMessage"),"کلاس با موفقیت حذف شد.","success");
+            await loadClasses();
+        }));
+    }
+
+    function openClassModal(item=null) {
+        editingClassId=item?.id || null;
+        document.getElementById("classModalTitle").textContent=item ? "✏️ ویرایش کلاس" : "➕ افزودن کلاس";
+        document.getElementById("className").value=item?.name || "";
+        document.getElementById("classGrade").value=item?.grade || "";
+        document.getElementById("classSection").value=item?.section || "";
+        document.getElementById("classCapacity").value=item?.capacity ?? "";
+        hideMessage(document.getElementById("classFormMessage"));
+        classModal.classList.add("open");
+        loadAcademicYearsForClass(item?.academic_year_id || "").catch(e=>showMessage(document.getElementById("classFormMessage"),"دریافت سال تحصیلی انجام نشد: "+e.message,"error"));
+        setTimeout(()=>document.getElementById("className").focus(),50);
+    }
+    function closeClassModal(){ classModal.classList.remove("open"); editingClassId=null; classForm.reset(); hideMessage(document.getElementById("classFormMessage")); }
+    document.getElementById("addClassButton").addEventListener("click",()=>openClassModal());
+    document.getElementById("refreshClassesButton").addEventListener("click",loadClasses);
+    document.getElementById("closeClassModal").addEventListener("click",closeClassModal);
+    document.getElementById("cancelClassButton").addEventListener("click",closeClassModal);
+    classModal.addEventListener("click",e=>{if(e.target===classModal)closeClassModal();});
+    document.getElementById("classSearchInput").addEventListener("input",function(){
+        const q=this.value.trim().toLowerCase();
+        if(!q){renderClasses(allSchoolClasses);return;}
+        renderClasses(allSchoolClasses.filter(x=>[x.name,x.grade,x.section,classYearMap[x.academic_year_id]?.title].filter(Boolean).join(" ").toLowerCase().includes(q)));
+    });
+    classForm.addEventListener("submit",async function(e){
+        e.preventDefault();
+        const button=document.getElementById("saveClassButton");
+        const schoolId=await getCurrentSchoolId();
+        const academic_year_id=document.getElementById("classAcademicYear").value;
+        const name=document.getElementById("className").value.trim();
+        const grade=document.getElementById("classGrade").value.trim()||null;
+        const section=document.getElementById("classSection").value.trim()||null;
+        const raw=document.getElementById("classCapacity").value;
+        const capacity=raw?Number(raw):null;
+        if(!academic_year_id||!name){showMessage(document.getElementById("classFormMessage"),"سال تحصیلی و نام کلاس الزامی است.","error");return;}
+        if(capacity!==null&&(!Number.isInteger(capacity)||capacity<1)){showMessage(document.getElementById("classFormMessage"),"ظرفیت باید عدد صحیح بزرگ‌تر از صفر باشد.","error");return;}
+        button.disabled=true; button.textContent="در حال ذخیره...";
+        try{
+            let result;
+            if(editingClassId){
+                result=await supabaseClient.from("classes").update({academic_year_id,name,grade,section,capacity}).eq("id",editingClassId).eq("school_id",schoolId);
+            }else{
+                result=await supabaseClient.from("classes").insert({school_id:schoolId,academic_year_id,name,grade,section,capacity});
+            }
+            if(result.error) throw result.error;
+            const wasEditing = Boolean(editingClassId);
+            closeClassModal();
+            await loadClasses();
+            await loadStudentClasses();
+            showMessage(document.getElementById("classesPageMessage"),wasEditing?"کلاس با موفقیت ویرایش شد.":"کلاس با موفقیت ایجاد شد.","success");
+        }catch(err){showMessage(document.getElementById("classFormMessage"),"ذخیره کلاس انجام نشد: "+err.message,"error");}
+        finally{button.disabled=false;button.textContent="💾 ذخیره کلاس";}
+    });
 
 
     /* =========================================================
@@ -2143,6 +2368,13 @@
                 studentModal.classList.contains("open")
             ) {
                 closeStudentModal();
+            }
+
+            if (
+                event.key === "Escape" &&
+                classModal.classList.contains("open")
+            ) {
+                closeClassModal();
             }
 
         }
