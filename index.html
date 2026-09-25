@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>سامانه مدیریت مدرسه</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -16,277 +17,254 @@
             box-sizing: border-box;
         }
 
-        body {
+        html, body {
             margin: 0;
-            font-family: Tahoma, Arial, sans-serif;
-            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #1e293b;
         }
 
-        .container {
-            width: 100%;
-            max-width: 430px;
-            padding: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 32px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.10);
-        }
-
-        .logo {
-            width: 70px;
-            height: 70px;
-            border-radius: 18px;
-            background: #4f46e5;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 32px;
-        }
-
-        h1 {
-            text-align: center;
-            margin: 0 0 8px;
-            font-size: 25px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 28px;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 17px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 7px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        input {
-            width: 100%;
-            padding: 13px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 15px;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        input:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10);
+        button, input, select, textarea {
+            font-family: inherit;
         }
 
         button {
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            padding: 13px;
-            font-size: 15px;
-            font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .primary {
-            background: #4f46e5;
-            color: white;
-        }
-
-        .primary:hover {
-            background: #4338ca;
-        }
-
-        .secondary {
-            background: #f1f5f9;
-            color: #334155;
-            margin-top: 10px;
-        }
-
-        .secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .link-button {
-            background: transparent;
-            color: #4f46e5;
-            margin-top: 12px;
-            padding: 8px;
-        }
-
-        .link-button:hover {
-            text-decoration: underline;
-        }
-
-        .message {
-            display: none;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 18px;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-
-        .success {
-            display: block;
-            background: #ecfdf5;
-            color: #047857;
-            border: 1px solid #a7f3d0;
-        }
-
-        .error {
-            display: block;
-            background: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-
-        .info {
-            display: block;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .account-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 18px;
-            line-height: 2;
-        }
+        /* =====================================================
+           LOGIN / AUTH
+           ===================================================== */
 
-        .account-title {
-            font-weight: bold;
-            font-size: 17px;
-            margin-bottom: 10px;
-        }
-
-        .account-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 5px 0;
-        }
-
-        .account-row:last-child {
-            border-bottom: none;
-        }
-
-        .role {
-            display: inline-block;
-            background: #e0e7ff;
-            color: #3730a3;
-            padding: 2px 9px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin: 2px;
-        }
-
-        .footer {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 18px;
-        }
-
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        /* =========================
-           ADMIN DASHBOARD
-           ========================= */
-        .dashboard-shell {
+        #authApp {
+            min-height: 100vh;
             width: 100%;
-            max-width: 1180px;
-            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background:
+                radial-gradient(circle at top right, #e0e7ff 0, transparent 35%),
+                radial-gradient(circle at bottom left, #dbeafe 0, transparent 35%),
+                #f8fafc;
         }
 
-        .dashboard {
-            background: #f8fafc;
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.10);
-            min-height: 680px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, .10);
+        }
+
+        .logo {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 18px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #4f46e5;
+            color: #fff;
+            font-size: 32px;
+        }
+
+        .auth-card h1 {
+            margin: 0 0 8px;
+            text-align: center;
+            font-size: 25px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin: 0 0 25px;
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        input {
+            width: 100%;
+            height: 46px;
+            padding: 0 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 11px;
+            outline: none;
+            background: #fff;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+        }
+
+        .btn {
+            width: 100%;
+            min-height: 45px;
+            border: 0;
+            border-radius: 11px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            margin-top: 10px;
+        }
+
+        .btn-link {
+            background: transparent;
+            color: #4f46e5;
+            margin-top: 10px;
+        }
+
+        .message {
+            display: none;
+            padding: 11px 13px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        .message.success {
+            display: block;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .message.error {
+            display: block;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .message.info {
+            display: block;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* =====================================================
+           DASHBOARD - IMPORTANT: completely outside auth card
+           ===================================================== */
+
+        #dashboardApp {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        #dashboardApp.visible {
+            display: block;
         }
 
         .dashboard-header {
-            background: white;
+            width: 100%;
+            height: 76px;
+            background: #fff;
             border-bottom: 1px solid #e2e8f0;
-            padding: 18px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            gap: 20px;
+            padding: 0 clamp(16px, 3vw, 42px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
         .brand-area {
             display: flex;
             align-items: center;
             gap: 12px;
+            min-width: 0;
         }
 
         .brand-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
             background: #4f46e5;
-            color: white;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 23px;
+            font-size: 22px;
+            flex: 0 0 auto;
         }
 
         .brand-title {
             font-weight: 800;
-            font-size: 18px;
+            font-size: 17px;
+            white-space: nowrap;
         }
 
         .brand-school {
+            margin-top: 2px;
             color: #64748b;
-            font-size: 12px;
-            margin-top: 3px;
+            font-size: 11px;
+            white-space: nowrap;
         }
 
         .user-area {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+        }
+
+        .user-info {
+            text-align: left;
         }
 
         .user-name {
-            font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 800;
         }
 
         .user-role {
+            margin-top: 2px;
             color: #64748b;
-            font-size: 12px;
-            margin-top: 3px;
+            font-size: 10px;
         }
 
         .avatar {
@@ -299,49 +277,64 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
+            flex: 0 0 auto;
         }
 
-        .dashboard-body {
+        .logout-btn {
+            border: 0;
+            border-radius: 9px;
+            padding: 9px 12px;
+            background: #fef2f2;
+            color: #b91c1c;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .dashboard-layout {
+            width: 100%;
+            min-height: calc(100vh - 76px);
             display: grid;
-            grid-template-columns: 235px 1fr;
-            min-height: 610px;
+            grid-template-columns: 250px minmax(0, 1fr);
         }
 
         .sidebar {
-            background: white;
+            background: #fff;
             border-left: 1px solid #e2e8f0;
             padding: 18px 12px;
+            position: sticky;
+            top: 76px;
+            height: calc(100vh - 76px);
+            overflow-y: auto;
         }
 
         .nav-title {
             color: #94a3b8;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 8px 12px;
-            margin-bottom: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 8px 10px 6px;
         }
 
         .nav-item {
             width: 100%;
-            border: none;
+            border: 0;
             background: transparent;
             color: #334155;
             text-align: right;
-            padding: 11px 12px;
             border-radius: 10px;
-            margin-bottom: 4px;
-            cursor: pointer;
-            font-size: 13px;
+            padding: 11px 10px;
+            margin-bottom: 3px;
+            font-size: 12px;
             font-weight: 600;
         }
 
         .nav-item:hover {
-            background: #f1f5f9;
+            background: #f8fafc;
         }
 
         .nav-item.active {
             background: #eef2ff;
             color: #4338ca;
+            font-weight: 800;
         }
 
         .nav-icon {
@@ -349,201 +342,137 @@
             width: 25px;
         }
 
-        .dashboard-main {
-            padding: 25px;
-            overflow: auto;
+        .main-content {
+            min-width: 0;
+            width: 100%;
+            padding: clamp(18px, 3vw, 38px);
         }
 
-        .welcome-box {
+        .content-inner {
+            width: 100%;
+            max-width: 1700px;
+            margin: 0 auto;
+        }
+
+        /* =====================================================
+           DASHBOARD HOME
+           ===================================================== */
+
+        .welcome {
+            border-radius: 20px;
+            padding: clamp(20px, 3vw, 30px);
             background: linear-gradient(135deg, #4f46e5, #6366f1);
-            color: white;
-            border-radius: 18px;
-            padding: 24px;
-            margin-bottom: 22px;
+            color: #fff;
+            margin-bottom: 20px;
         }
 
-        .welcome-box h2 {
+        .welcome h2 {
             margin: 0 0 7px;
-            font-size: 23px;
+            font-size: clamp(20px, 2vw, 26px);
         }
 
-        .welcome-box p {
+        .welcome p {
             margin: 0;
-            opacity: 0.9;
-            font-size: 13px;
+            opacity: .9;
+            font-size: 12px;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 14px;
-            margin-bottom: 24px;
+            margin-bottom: 25px;
         }
 
         .stat-card {
-            background: white;
+            background: #fff;
             border: 1px solid #e2e8f0;
             border-radius: 15px;
             padding: 18px;
         }
 
         .stat-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 23px;
+            margin-bottom: 8px;
         }
 
         .stat-title {
             color: #64748b;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .stat-value {
+            margin-top: 4px;
             font-size: 25px;
             font-weight: 800;
-            margin-top: 5px;
         }
 
         .section-title {
+            margin: 0 0 13px;
             font-size: 17px;
-            font-weight: 800;
-            margin: 0 0 14px;
         }
 
         .modules-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 14px;
         }
 
         .module-card {
-            background: white;
+            background: #fff;
             border: 1px solid #e2e8f0;
             border-radius: 15px;
             padding: 18px;
+            transition: .2s;
             cursor: pointer;
-            transition: 0.2s;
         }
 
         .module-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+            box-shadow: 0 8px 25px rgba(15,23,42,.07);
             border-color: #c7d2fe;
         }
 
         .module-icon {
-            width: 43px;
-            height: 43px;
-            border-radius: 12px;
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
             background: #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 21px;
-            margin-bottom: 12px;
+            font-size: 20px;
+            margin-bottom: 11px;
         }
 
         .module-card h3 {
             margin: 0 0 5px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .module-card p {
             margin: 0;
             color: #64748b;
-            font-size: 11px;
-            line-height: 1.8;
+            font-size: 10px;
+            line-height: 1.9;
         }
 
-        .dashboard-footer {
-            margin-top: 24px;
-            color: #94a3b8;
-            font-size: 11px;
-            text-align: center;
-        }
+        /* =====================================================
+           MODULE PAGES
+           ===================================================== */
 
-        .logout-dashboard {
-            width: auto;
-            padding: 9px 13px;
-            background: #fef2f2;
-            color: #b91c1c;
-            font-size: 12px;
-        }
-
-        @media (max-width: 900px) {
-            .dashboard-body {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                border-left: none;
-                border-bottom: 1px solid #e2e8f0;
-                display: flex;
-                overflow-x: auto;
-                gap: 5px;
-            }
-
-            .nav-title {
-                display: none;
-            }
-
-            .nav-item {
-                min-width: max-content;
-                margin: 0;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .modules-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .dashboard-shell {
-                padding: 8px;
-            }
-
-            .dashboard-header {
-                padding: 14px;
-            }
-
-            .user-name,
-            .user-role {
-                display: none;
-            }
-
-            .dashboard-main {
-                padding: 16px;
-            }
-
-            .stats-grid,
-            .modules-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .welcome-box {
-                padding: 19px;
-            }
-        }
-
-
-        /* =========================
-           STUDENTS MANAGEMENT
-           ========================= */
         .module-page {
             display: none;
         }
 
         .module-page.active {
-            display: block !important;
+            display: block;
         }
 
         .page-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             gap: 15px;
             margin-bottom: 18px;
         }
@@ -556,398 +485,204 @@
         .page-header p {
             margin: 0;
             color: #64748b;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .page-actions {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
         }
 
-        .secondary-button {
+        .small-btn {
             width: auto;
+            min-height: 40px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 10px;
             background: #eef2ff;
             color: #4338ca;
-            padding: 10px 15px;
-            font-size: 12px;
+            font-weight: 700;
+            font-size: 11px;
         }
 
-        .students-toolbar {
-            background: white;
+        .toolbar {
+            background: #fff;
             border: 1px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 14px;
-            margin-bottom: 15px;
+            border-radius: 14px;
+            padding: 13px;
             display: flex;
-            gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        .students-search {
+        .toolbar input {
             flex: 1;
-            min-width: 220px;
-            margin: 0;
+            min-width: 0;
         }
 
-        .students-count {
-            color: #64748b;
-            font-size: 12px;
+        .count {
             white-space: nowrap;
+            color: #64748b;
+            font-size: 11px;
         }
 
-        .students-table-wrap {
-            background: white;
+        .table-card {
+            width: 100%;
+            background: #fff;
             border: 1px solid #e2e8f0;
             border-radius: 15px;
-            overflow: auto;
+            overflow: hidden;
+        }
+
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
         .students-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 650px;
+            min-width: 760px;
         }
 
-        .students-table th,
-        .students-table td {
-            padding: 13px 15px;
+        th, td {
+            padding: 13px 14px;
             border-bottom: 1px solid #f1f5f9;
             text-align: right;
-            font-size: 12px;
+            font-size: 11px;
             white-space: nowrap;
         }
 
-        .students-table th {
+        th {
             background: #f8fafc;
             color: #475569;
             font-weight: 800;
         }
 
-        .students-table tr:last-child td {
-            border-bottom: none;
+        tr:last-child td {
+            border-bottom: 0;
         }
 
-        .student-name-cell {
-            font-weight: 700;
+        .student-name {
+            font-weight: 800;
         }
 
-        .student-sub {
+        .student-id {
+            margin-top: 2px;
             color: #94a3b8;
-            font-size: 10px;
-            margin-top: 3px;
+            font-size: 9px;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 5px 9px;
+        .status {
+            display: inline-flex;
+            padding: 4px 9px;
             border-radius: 999px;
-            font-size: 10px;
-            font-weight: 700;
+            font-size: 9px;
+            font-weight: 800;
         }
 
-        .status-active {
-            background: #ecfdf5;
+        .status.active {
             color: #047857;
+            background: #ecfdf5;
         }
 
-        .status-inactive {
-            background: #fef2f2;
+        .status.inactive {
             color: #b91c1c;
+            background: #fef2f2;
         }
 
         .empty-state {
+            padding: 55px 20px;
             text-align: center;
-            padding: 45px 20px;
             color: #64748b;
         }
 
-        .empty-state .empty-icon {
-            font-size: 35px;
+        .empty-state .icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        /* =====================================================
+           OTHER MODULE PLACEHOLDER
+           ===================================================== */
+
+        .coming-soon {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 55px 20px;
+            text-align: center;
+        }
+
+        .coming-soon .icon {
+            font-size: 42px;
             margin-bottom: 10px;
         }
 
-        .loading-row {
-            text-align: center !important;
-            color: #64748b;
-            padding: 30px !important;
+        .coming-soon h3 {
+            margin: 0 0 7px;
         }
 
-        @media (max-width: 650px) {
-            .page-header {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .students-toolbar {
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .students-search {
-                min-width: 0;
-            }
-        }
-
-
-        /* =========================================================
-           FINAL RESPONSIVE / VAZIRMATN OVERRIDES
-           ========================================================= */
-        html, body {
-            width: 100%;
-            min-height: 100%;
-        }
-
-        body,
-        input,
-        button,
-        textarea,
-        select,
-        table {
-            font-family: "Vazirmatn", Tahoma, Arial, sans-serif !important;
-        }
-
-        body {
+        .coming-soon p {
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            overflow-x: hidden;
+            color: #64748b;
+            font-size: 12px;
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
 
-        .dashboard-shell {
-            width: 100%;
-            max-width: none !important;
-            min-height: 100vh;
-            padding: 0 !important;
-        }
-
-        .dashboard {
-            width: 100%;
-            min-height: 100vh;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-        }
-
-        .dashboard-header {
-            width: 100%;
-            min-height: 76px;
-        }
-
-        .dashboard-body {
-            width: 100%;
-            min-height: calc(100vh - 76px);
-            grid-template-columns: 250px minmax(0, 1fr) !important;
-        }
-
-        .sidebar {
-            width: 250px;
-            min-width: 250px;
-            overflow-y: auto;
-        }
-
-        .dashboard-main {
-            width: 100%;
-            min-width: 0;
-            padding: 28px clamp(18px, 3vw, 42px) 40px !important;
-        }
-
-        .dashboard-main > * {
-            max-width: 1500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-        }
-
-        .modules-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        }
-
-        /* Student page */
-        #studentsPage {
-            width: 100%;
-        }
-
-        .students-table-wrap {
-            width: 100%;
-        }
-
-        .students-table {
-            width: 100%;
-            min-width: 720px;
-        }
-
-        .students-search {
-            min-height: 44px;
-        }
-
-        .page-actions button {
-            min-height: 42px;
-        }
-
-        /* Desktop large */
-        @media (min-width: 1400px) {
-            .dashboard-body {
-                grid-template-columns: 280px minmax(0, 1fr) !important;
-            }
-
-            .sidebar {
-                width: 280px;
-                min-width: 280px;
-            }
-
-            .dashboard-main {
-                padding-left: 55px !important;
-                padding-right: 55px !important;
-            }
-        }
-
-        /* Tablet */
         @media (max-width: 1100px) {
+            .dashboard-layout {
+                grid-template-columns: 215px minmax(0, 1fr);
+            }
+
             .stats-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
             .modules-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            }
-
-            .dashboard-body {
-                grid-template-columns: 220px minmax(0, 1fr) !important;
-            }
-
-            .sidebar {
-                width: 220px;
-                min-width: 220px;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
 
-        /* Mobile */
         @media (max-width: 760px) {
+            #authApp {
+                padding: 12px;
+            }
+
+            .auth-card {
+                padding: 22px;
+                border-radius: 18px;
+            }
+
             .dashboard-header {
-                padding: 12px 14px !important;
-                min-height: 68px;
+                height: 68px;
+                padding: 0 10px;
             }
 
             .brand-icon {
-                width: 40px;
-                height: 40px;
-                border-radius: 11px;
-                font-size: 19px;
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
             }
 
             .brand-title {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .brand-school {
-                font-size: 10px;
+                font-size: 9px;
             }
 
-            .dashboard-body {
-                display: block !important;
-                min-height: calc(100vh - 68px);
-            }
-
-            .sidebar {
-                width: 100% !important;
-                min-width: 0 !important;
-                border-left: 0 !important;
-                border-bottom: 1px solid #e2e8f0;
-                padding: 8px !important;
-                display: flex !important;
-                flex-direction: row !important;
-                gap: 5px;
-                overflow-x: auto;
-                overflow-y: hidden;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .nav-title {
-                display: none !important;
-            }
-
-            .nav-item {
-                flex: 0 0 auto;
-                width: auto !important;
-                min-width: max-content;
-                padding: 9px 11px !important;
-                margin: 0 !important;
-                font-size: 11px !important;
-                text-align: center !important;
-            }
-
-            .nav-icon {
-                width: auto;
-                margin-left: 3px;
-            }
-
-            .dashboard-main {
-                padding: 18px 12px 28px !important;
-            }
-
-            .stats-grid,
-            .modules-grid {
-                grid-template-columns: 1fr !important;
-            }
-
-            .welcome-box {
-                border-radius: 14px;
-                padding: 18px !important;
-            }
-
-            .welcome-box h2 {
-                font-size: 19px;
-            }
-
-            .page-header {
-                flex-direction: column !important;
-                align-items: stretch !important;
-            }
-
-            .page-actions {
-                width: 100%;
-            }
-
-            .page-actions button {
-                flex: 1;
-            }
-
-            .students-toolbar {
-                flex-direction: column !important;
-                align-items: stretch !important;
-            }
-
-            .students-search {
-                width: 100% !important;
-                min-width: 0 !important;
-            }
-
-            .students-count {
-                text-align: right;
-            }
-
-            .students-table-wrap {
-                border-radius: 12px;
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .students-table {
-                min-width: 700px;
-            }
-        }
-
-        @media (max-width: 430px) {
-            .user-area {
-                gap: 6px;
+            .user-info {
+                display: none;
             }
 
             .avatar {
@@ -956,422 +691,332 @@
                 font-size: 12px;
             }
 
-            .logout-dashboard {
-                padding: 8px 9px !important;
-                font-size: 10px !important;
+            .logout-btn {
+                padding: 8px 9px;
+                font-size: 10px;
             }
 
-            .brand-title {
-                font-size: 12px;
+            .dashboard-layout {
+                display: block;
+                min-height: calc(100vh - 68px);
             }
 
-            .dashboard-main {
-                padding-left: 9px !important;
-                padding-right: 9px !important;
+            .sidebar {
+                position: sticky;
+                top: 68px;
+                z-index: 40;
+                width: 100%;
+                height: auto;
+                padding: 7px;
+                border-left: 0;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                gap: 4px;
+                overflow-x: auto;
+            }
+
+            .nav-title {
+                display: none;
+            }
+
+            .nav-item {
+                width: auto;
+                min-width: max-content;
+                flex: 0 0 auto;
+                margin: 0;
+                padding: 9px 10px;
+                font-size: 10px;
+                text-align: center;
+            }
+
+            .main-content {
+                padding: 12px;
+            }
+
+            .stats-grid,
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .page-actions {
+                width: 100%;
+            }
+
+            .page-actions .small-btn {
+                flex: 1;
+            }
+
+            .toolbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .toolbar input {
+                width: 100%;
+            }
+
+            .count {
+                text-align: right;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .main-content {
+                padding: 9px;
+            }
+
+            .welcome {
+                padding: 18px;
             }
 
             .page-actions {
                 flex-direction: column;
             }
 
-            .page-actions button {
+            .page-actions .small-btn {
                 width: 100%;
             }
         }
-
-
-        /* =========================================================
-           FINAL DESKTOP WIDTH FIX
-           The dashboard lives inside .container, whose original
-           max-width was 430px for the login screen.
-           ========================================================= */
-
-        html, body {
-            width: 100%;
-            min-width: 100%;
-        }
-
-        body {
-            display: block !important;
-            overflow-x: hidden;
-        }
-
-        .container {
-            width: 100% !important;
-            max-width: none !important;
-            min-height: 100vh;
-            padding: 0 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-        }
-
-        /* Login / recovery cards keep their comfortable width */
-        .container > .card {
-            width: min(430px, calc(100% - 32px));
-            max-width: 430px;
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-
-        /* Dashboard must use the entire desktop viewport */
-        .container > #accountCard.dashboard-shell {
-            width: 100% !important;
-            max-width: none !important;
-            min-height: 100vh;
-            padding: 0 !important;
-            margin: 0 !important;
-            align-self: stretch !important;
-        }
-
-        #accountCard .dashboard {
-            width: 100% !important;
-            max-width: none !important;
-            min-height: 100vh;
-        }
-
-        #accountCard .dashboard-main {
-            width: 100%;
-        }
-
-        /* Keep desktop content readable without squeezing it */
-        @media (min-width: 1200px) {
-            #accountCard .dashboard-main {
-                padding-left: 40px !important;
-                padding-right: 40px !important;
-            }
-
-            #accountCard .dashboard-main > * {
-                max-width: 1700px;
-            }
-        }
-
-        /* Better mobile behavior */
-        @media (max-width: 760px) {
-            .container > .card {
-                width: calc(100% - 18px);
-                margin-top: 18px;
-                margin-bottom: 18px;
-            }
-
-            .container > #accountCard.dashboard-shell {
-                width: 100% !important;
-            }
-        }
-
     </style>
 </head>
 
 <body>
 
-<div class="container">
+    <!-- =====================================================
+         AUTH APP
+         ===================================================== -->
+    <section id="authApp">
 
-    <!-- LOGIN -->
-    <div id="loginCard" class="card">
+        <div id="loginCard" class="auth-card">
 
-        <div class="logo">🏫</div>
+            <div class="logo">🏫</div>
 
-        <h1>سامانه مدیریت مدرسه</h1>
-        <div class="subtitle">ورود به حساب کاربری</div>
+            <h1>سامانه مدیریت مدرسه</h1>
+            <p class="subtitle">ورود به حساب کاربری</p>
 
-        <div id="loginMessage" class="message"></div>
+            <div id="loginMessage" class="message"></div>
 
-        <form id="loginForm">
+            <form id="loginForm">
 
-            <div class="form-group">
-                <label for="loginEmail">ایمیل</label>
-                <input
-                    type="email"
-                    id="loginEmail"
-                    placeholder="ایمیل خود را وارد کنید"
-                    required
-                    autocomplete="email"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="loginPassword">رمز عبور</label>
-                <input
-                    type="password"
-                    id="loginPassword"
-                    placeholder="رمز عبور"
-                    required
-                    autocomplete="current-password"
-                >
-            </div>
-
-            <button type="submit" id="loginButton" class="primary">
-                ورود
-            </button>
-
-        </form>
-
-        <button id="forgotButton" class="link-button">
-            فراموشی رمز عبور
-        </button>
-
-        <div class="footer">
-            سامانه مدیریت مدرسه
-        </div>
-    </div>
-
-
-    <!-- FORGOT PASSWORD -->
-    <div id="forgotCard" class="card hidden">
-
-        <div class="logo">🔐</div>
-
-        <h1>بازیابی رمز عبور</h1>
-
-        <div class="subtitle">
-            ایمیل حساب کاربری خود را وارد کنید
-        </div>
-
-        <div id="forgotMessage" class="message"></div>
-
-        <form id="forgotForm">
-
-            <div class="form-group">
-                <label for="forgotEmail">ایمیل</label>
-
-                <input
-                    type="email"
-                    id="forgotEmail"
-                    placeholder="example@email.com"
-                    required
-                    autocomplete="email"
-                >
-            </div>
-
-            <button type="submit" id="forgotSubmit" class="primary">
-                ارسال لینک بازیابی
-            </button>
-
-        </form>
-
-        <button id="backToLoginFromForgot" class="secondary">
-            بازگشت به ورود
-        </button>
-
-    </div>
-
-
-    <!-- UPDATE PASSWORD -->
-    <div id="updatePasswordCard" class="card hidden">
-
-        <div class="logo">🔑</div>
-
-        <h1>تعیین رمز جدید</h1>
-
-        <div class="subtitle">
-            رمز جدید حساب کاربری خود را وارد کنید
-        </div>
-
-        <div id="updateMessage" class="message"></div>
-
-        <form id="updatePasswordForm">
-
-            <div class="form-group">
-                <label for="newPassword">رمز جدید</label>
-
-                <input
-                    type="password"
-                    id="newPassword"
-                    placeholder="حداقل 6 کاراکتر"
-                    minlength="6"
-                    required
-                    autocomplete="new-password"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="confirmPassword">تکرار رمز جدید</label>
-
-                <input
-                    type="password"
-                    id="confirmPassword"
-                    placeholder="رمز جدید را دوباره وارد کنید"
-                    minlength="6"
-                    required
-                    autocomplete="new-password"
-                >
-            </div>
-
-            <button type="submit" id="updatePasswordButton" class="primary">
-                ذخیره رمز جدید
-            </button>
-
-        </form>
-
-    </div>
-
-
-
-    <!-- ADMIN DASHBOARD -->
-    <div id="accountCard" class="dashboard-shell hidden">
-
-        <div class="dashboard">
-
-            <header class="dashboard-header">
-
-                <div class="brand-area">
-                    <div class="brand-icon">🏫</div>
-                    <div>
-                        <div class="brand-title">سامانه مدیریت مدرسه</div>
-                        <div class="brand-school" id="dashboardSchool">مدرسه من</div>
-                    </div>
+                <div class="form-group">
+                    <label for="loginEmail">ایمیل</label>
+                    <input id="loginEmail" type="email" required autocomplete="email">
                 </div>
 
-                <div class="user-area">
-                    <div>
-                        <div class="user-name" id="dashboardUserName">مدیر سامانه</div>
-                        <div class="user-role" id="dashboardUserRole">مدیر</div>
-                    </div>
-                    <div class="avatar" id="dashboardAvatar">م</div>
-                    <button id="dashboardLogoutButton" class="logout-dashboard">
-                        خروج
-                    </button>
+                <div class="form-group">
+                    <label for="loginPassword">رمز عبور</label>
+                    <input id="loginPassword" type="password" required autocomplete="current-password">
                 </div>
 
-            </header>
+                <button id="loginButton" class="btn btn-primary" type="submit">
+                    ورود
+                </button>
 
-            <div class="dashboard-body">
+                <button id="forgotButton" class="btn btn-link" type="button">
+                    فراموشی رمز عبور
+                </button>
 
-                <aside class="sidebar">
+            </form>
+        </div>
 
-                    <div class="nav-title">مدیریت مدرسه</div>
 
-                    <button class="nav-item active" data-module="dashboard">
-                        <span class="nav-icon">📊</span> داشبورد
-                    </button>
+        <!-- FORGOT PASSWORD -->
+        <div id="forgotCard" class="auth-card hidden">
 
-                    <button class="nav-item" data-module="students">
-                        <span class="nav-icon">👨‍🎓</span> دانش‌آموزان
-                    </button>
+            <div class="logo">🔐</div>
 
-                    <button class="nav-item" data-module="teachers">
-                        <span class="nav-icon">👨‍🏫</span> معلمان
-                    </button>
+            <h1>بازیابی رمز عبور</h1>
+            <p class="subtitle">لینک بازیابی برای ایمیل شما ارسال می‌شود.</p>
 
-                    <button class="nav-item" data-module="classes">
-                        <span class="nav-icon">🏫</span> کلاس‌ها
-                    </button>
+            <div id="forgotMessage" class="message"></div>
 
-                    <button class="nav-item" data-module="subjects">
-                        <span class="nav-icon">📚</span> دروس
-                    </button>
+            <form id="forgotForm">
 
-                    <div class="nav-title">آموزشی</div>
+                <div class="form-group">
+                    <label for="forgotEmail">ایمیل</label>
+                    <input id="forgotEmail" type="email" required>
+                </div>
 
-                    <button class="nav-item" data-module="attendance">
-                        <span class="nav-icon">📋</span> حضور و غیاب
-                    </button>
+                <button id="forgotSubmit" class="btn btn-primary" type="submit">
+                    ارسال لینک بازیابی
+                </button>
 
-                    <button class="nav-item" data-module="grades">
-                        <span class="nav-icon">📝</span> نمرات و کارنامه
-                    </button>
+                <button id="backToLoginFromForgot" class="btn btn-secondary" type="button">
+                    بازگشت به ورود
+                </button>
 
-                    <button class="nav-item" data-module="exams">
-                        <span class="nav-icon">🧪</span> آزمون آنلاین
-                    </button>
+            </form>
+        </div>
 
-                    <button class="nav-item" data-module="discipline">
-                        <span class="nav-icon">⚠️</span> انضباط
-                    </button>
 
-                    <div class="nav-title">ارتباطات</div>
+        <!-- UPDATE PASSWORD -->
+        <div id="updatePasswordCard" class="auth-card hidden">
 
-                    <button class="nav-item" data-module="chat">
-                        <span class="nav-icon">💬</span> پیام‌ها
-                    </button>
+            <div class="logo">🔑</div>
 
-                    <button class="nav-item" data-module="online">
-                        <span class="nav-icon">🎥</span> کلاس آنلاین
-                    </button>
+            <h1>تعیین رمز جدید</h1>
+            <p class="subtitle">رمز جدید حساب خود را وارد کنید.</p>
 
-                </aside>
+            <div id="updateMessage" class="message"></div>
 
-                <main class="dashboard-main">
+            <form id="updatePasswordForm">
+
+                <div class="form-group">
+                    <label for="newPassword">رمز جدید</label>
+                    <input id="newPassword" type="password" minlength="6" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">تکرار رمز جدید</label>
+                    <input id="confirmPassword" type="password" minlength="6" required>
+                </div>
+
+                <button id="updatePasswordButton" class="btn btn-primary" type="submit">
+                    ذخیره رمز جدید
+                </button>
+
+            </form>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DASHBOARD APP
+         ===================================================== -->
+    <section id="dashboardApp">
+
+        <header class="dashboard-header">
+
+            <div class="brand-area">
+
+                <div class="brand-icon">🏫</div>
+
+                <div>
+                    <div class="brand-title">سامانه مدیریت مدرسه</div>
+                    <div id="dashboardSchool" class="brand-school">مدرسه من</div>
+                </div>
+
+            </div>
+
+
+            <div class="user-area">
+
+                <div class="user-info">
+                    <div id="dashboardUserName" class="user-name">مدیر سامانه</div>
+                    <div id="dashboardUserRole" class="user-role">مدیر</div>
+                </div>
+
+                <div id="dashboardAvatar" class="avatar">م</div>
+
+                <button id="dashboardLogoutButton" class="logout-btn">
+                    خروج
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <div class="dashboard-layout">
+
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+
+                <div class="nav-title">مدیریت مدرسه</div>
+
+                <button class="nav-item active" data-module="dashboard">
+                    <span class="nav-icon">📊</span>
+                    داشبورد
+                </button>
+
+                <button class="nav-item" data-module="students">
+                    <span class="nav-icon">👨‍🎓</span>
+                    دانش‌آموزان
+                </button>
+
+                <button class="nav-item" data-module="teachers">
+                    <span class="nav-icon">👨‍🏫</span>
+                    معلمان
+                </button>
+
+                <button class="nav-item" data-module="classes">
+                    <span class="nav-icon">🏫</span>
+                    کلاس‌ها
+                </button>
+
+                <button class="nav-item" data-module="subjects">
+                    <span class="nav-icon">📚</span>
+                    دروس
+                </button>
+
+                <div class="nav-title">آموزشی</div>
+
+                <button class="nav-item" data-module="attendance">
+                    <span class="nav-icon">📋</span>
+                    حضور و غیاب
+                </button>
+
+                <button class="nav-item" data-module="grades">
+                    <span class="nav-icon">📝</span>
+                    نمرات و کارنامه
+                </button>
+
+                <button class="nav-item" data-module="exams">
+                    <span class="nav-icon">🧪</span>
+                    آزمون آنلاین
+                </button>
+
+                <button class="nav-item" data-module="discipline">
+                    <span class="nav-icon">⚠️</span>
+                    انضباط
+                </button>
+
+                <div class="nav-title">ارتباطات</div>
+
+                <button class="nav-item" data-module="chat">
+                    <span class="nav-icon">💬</span>
+                    پیام‌ها
+                </button>
+
+                <button class="nav-item" data-module="online">
+                    <span class="nav-icon">🎥</span>
+                    کلاس آنلاین
+                </button>
+
+            </aside>
+
+
+            <!-- MAIN -->
+            <main class="main-content">
+
+                <div class="content-inner">
 
                     <div id="dashboardMessage" class="message"></div>
 
 
-                    <!-- STUDENTS MANAGEMENT PAGE -->
-                    <section id="studentsPage" class="module-page">
-
-                        <div class="page-header">
-                            <div>
-                                <h2>👨‍🎓 مدیریت دانش‌آموزان</h2>
-                                <p>مشاهده و جستجوی دانش‌آموزان مدرسه</p>
-                            </div>
-
-                            <div class="page-actions">
-                                <button id="refreshStudentsButton" class="secondary-button">
-                                    🔄 بروزرسانی
-                                </button>
-                                <button id="addStudentButton" class="secondary-button">
-                                    ➕ افزودن دانش‌آموز
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="studentsPageMessage" class="message"></div>
-
-                        <div class="students-toolbar">
-                            <input
-                                id="studentSearchInput"
-                                class="students-search"
-                                type="text"
-                                placeholder="جستجو بر اساس نام، نام خانوادگی، کد ملی یا شماره موبایل..."
-                            >
-
-                            <div id="studentsCount" class="students-count">
-                                در حال دریافت اطلاعات...
-                            </div>
-                        </div>
-
-                        <div class="students-table-wrap">
-
-                            <table class="students-table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>دانش‌آموز</th>
-                                        <th>کد ملی</th>
-                                        <th>موبایل</th>
-                                        <th>وضعیت</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="studentsTableBody">
-                                    <tr>
-                                        <td colspan="5" class="loading-row">
-                                            در حال دریافت دانش‌آموزان...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                        </div>
-
-                    </section>
-
+                    <!-- HOME -->
                     <section id="dashboardHome">
 
-                        <div class="welcome-box">
+                        <div class="welcome">
                             <h2 id="welcomeTitle">خوش آمدید 👋</h2>
                             <p>
-                                پنل مدیریت مدرسه آماده است. از منوی کنار، بخش موردنظر را انتخاب کنید.
+                                پنل مدیریت مدرسه آماده است. بخش موردنظر را از منوی سمت راست انتخاب کنید.
                             </p>
                         </div>
+
 
                         <div class="stats-grid">
 
                             <div class="stat-card">
                                 <div class="stat-icon">👨‍🎓</div>
                                 <div class="stat-title">دانش‌آموزان</div>
-                                <div class="stat-value">—</div>
+                                <div id="studentStat" class="stat-value">—</div>
                             </div>
 
                             <div class="stat-card">
@@ -1394,50 +1039,52 @@
 
                         </div>
 
+
                         <h2 class="section-title">بخش‌های سامانه</h2>
+
 
                         <div class="modules-grid">
 
                             <div class="module-card" data-module="students">
                                 <div class="module-icon">👨‍🎓</div>
                                 <h3>مدیریت دانش‌آموزان</h3>
-                                <p>ثبت، ویرایش و مشاهده اطلاعات دانش‌آموزان.</p>
+                                <p>مشاهده و مدیریت اطلاعات دانش‌آموزان.</p>
                             </div>
 
                             <div class="module-card" data-module="teachers">
                                 <div class="module-icon">👨‍🏫</div>
                                 <h3>مدیریت معلمان</h3>
-                                <p>مدیریت اطلاعات و ارتباط معلمان با کلاس‌ها.</p>
+                                <p>مدیریت معلمان و ارتباط آن‌ها با کلاس‌ها.</p>
                             </div>
 
                             <div class="module-card" data-module="classes">
                                 <div class="module-icon">🏫</div>
                                 <h3>مدیریت کلاس‌ها</h3>
-                                <p>ساخت کلاس و مدیریت اعضای هر کلاس.</p>
+                                <p>ساخت و مدیریت کلاس‌های مدرسه.</p>
                             </div>
 
                             <div class="module-card" data-module="subjects">
                                 <div class="module-icon">📚</div>
                                 <h3>مدیریت دروس</h3>
-                                <p>تعریف درس، واحد و ارتباط درس با کلاس.</p>
+                                <p>تعریف درس و واحد و ارتباط با کلاس.</p>
                             </div>
 
                             <div class="module-card" data-module="attendance">
                                 <div class="module-icon">📋</div>
                                 <h3>حضور و غیاب</h3>
-                                <p>ثبت و مشاهده وضعیت حضور دانش‌آموزان.</p>
+                                <p>ثبت و مشاهده حضور و غیاب.</p>
                             </div>
 
                             <div class="module-card" data-module="grades">
                                 <div class="module-icon">📝</div>
                                 <h3>نمرات و کارنامه</h3>
-                                <p>ثبت نمرات و آماده‌سازی کارنامه.</p>
+                                <p>ثبت نمرات و مدیریت کارنامه.</p>
                             </div>
 
                             <div class="module-card" data-module="exams">
                                 <div class="module-icon">🧪</div>
                                 <h3>آزمون آنلاین</h3>
-                                <p>ساخت و مدیریت آزمون‌های آنلاین.</p>
+                                <p>ساخت و مدیریت آزمون‌ها.</p>
                             </div>
 
                             <div class="module-card" data-module="discipline">
@@ -1448,148 +1095,285 @@
 
                             <div class="module-card" data-module="chat">
                                 <div class="module-icon">💬</div>
-                                <h3>پیام‌رسانی</h3>
-                                <p>اتاق‌های گفت‌وگو و پیام‌های مدرسه.</p>
+                                <h3>پیام‌ها</h3>
+                                <p>اتاق‌های گفت‌وگو و پیام‌رسانی.</p>
                             </div>
 
                             <div class="module-card" data-module="online">
                                 <div class="module-icon">🎥</div>
                                 <h3>کلاس آنلاین</h3>
-                                <p>مدیریت جلسات و لینک کلاس‌های آنلاین.</p>
+                                <p>مدیریت جلسات کلاس آنلاین.</p>
                             </div>
 
                         </div>
 
-                        <div class="dashboard-footer">
-                            نسخه اولیه داشبورد مدیریت مدرسه
+                    </section>
+
+
+                    <!-- STUDENTS -->
+                    <section id="studentsPage" class="module-page">
+
+                        <div class="page-header">
+
+                            <div>
+                                <h2>👨‍🎓 مدیریت دانش‌آموزان</h2>
+                                <p>لیست دانش‌آموزان مدرسه و اطلاعات پایه آن‌ها</p>
+                            </div>
+
+                            <div class="page-actions">
+                                <button id="refreshStudentsButton" class="small-btn">
+                                    🔄 بروزرسانی
+                                </button>
+
+                                <button id="addStudentButton" class="small-btn">
+                                    ➕ افزودن دانش‌آموز
+                                </button>
+                            </div>
+
+                        </div>
+
+
+                        <div id="studentsPageMessage" class="message"></div>
+
+
+                        <div class="toolbar">
+
+                            <input
+                                id="studentSearchInput"
+                                type="search"
+                                placeholder="جستجو بر اساس نام، نام خانوادگی، کد ملی یا موبایل..."
+                            >
+
+                            <div id="studentsCount" class="count">
+                                در حال دریافت...
+                            </div>
+
+                        </div>
+
+
+                        <div class="table-card">
+
+                            <div class="table-scroll">
+
+                                <table class="students-table">
+
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>دانش‌آموز</th>
+                                            <th>کد ملی</th>
+                                            <th>موبایل</th>
+                                            <th>وضعیت</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="studentsTableBody">
+
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="empty-state">
+                                                    در حال دریافت اطلاعات...
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
                         </div>
 
                     </section>
 
-                </main>
 
-            </div>
+                    <!-- OTHER MODULES -->
+                    <section id="otherModulePage" class="module-page">
+
+                        <div class="page-header">
+                            <div>
+                                <h2 id="otherModuleTitle">بخش سامانه</h2>
+                                <p id="otherModuleSubtitle">این بخش در مرحله بعد تکمیل می‌شود.</p>
+                            </div>
+                        </div>
+
+                        <div class="coming-soon">
+                            <div id="otherModuleIcon" class="icon">⚙️</div>
+                            <h3>این بخش آماده توسعه است</h3>
+                            <p>
+                                ساختار داشبورد آماده است و این قسمت را به دیتابیس متصل می‌کنیم.
+                            </p>
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </main>
 
         </div>
 
-    </div>
-
-
-</div>
+    </section>
 
 
 <script>
+    /* =========================================================
+       SUPABASE
+       ========================================================= */
 
-    // =========================================================
-    // SUPABASE CONFIG
-    // =========================================================
+    const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_00YDsLqILFIxhYgdZsRkyw_3CGXGhWb";
 
-const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
+    const { createClient } = supabase;
 
-    // فقط Publishable Key را اینجا قرار بده.
-    // Secret Key را هرگز اینجا قرار نده.
-    const SUPABASE_PUBLISHABLE_KEY =
-        "sb_publishable_00YDsLqILFIxhYgdZsRkyw_3CGXGhWb";
-
-
-    const { createClient } =
-        supabase;
-
-    const supabaseClient =
-        createClient(
-            SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY
-        );
+    const supabaseClient = createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
-    // =========================================================
-    // ELEMENTS
-    // =========================================================
+    /* =========================================================
+       ELEMENTS
+       ========================================================= */
 
-    const loginCard =
-        document.getElementById("loginCard");
+    const authApp = document.getElementById("authApp");
+    const dashboardApp = document.getElementById("dashboardApp");
 
-    const forgotCard =
-        document.getElementById("forgotCard");
+    const loginCard = document.getElementById("loginCard");
+    const forgotCard = document.getElementById("forgotCard");
+    const updatePasswordCard = document.getElementById("updatePasswordCard");
 
-    const updatePasswordCard =
-        document.getElementById("updatePasswordCard");
-
-    const accountCard =
-        document.getElementById("accountCard");
-
-
-    const loginForm =
-        document.getElementById("loginForm");
-
-    const forgotForm =
-        document.getElementById("forgotForm");
-
-    const updatePasswordForm =
-        document.getElementById("updatePasswordForm");
+    const loginForm = document.getElementById("loginForm");
+    const forgotForm = document.getElementById("forgotForm");
+    const updatePasswordForm = document.getElementById("updatePasswordForm");
 
 
-    const forgotButton =
-        document.getElementById("forgotButton");
-
-    const backToLoginFromForgot =
-        document.getElementById("backToLoginFromForgot");
-
- 
-    // =========================================================
-    // MESSAGE HELPERS
-    // =========================================================
+    /* =========================================================
+       HELPERS
+       ========================================================= */
 
     function showMessage(element, text, type) {
+        if (!element) return;
 
         element.textContent = text;
-
-        element.className =
-            "message " + type;
-
+        element.className = "message " + type;
     }
-
 
     function hideMessage(element) {
+        if (!element) return;
 
         element.textContent = "";
-
-        element.className =
-            "message";
-
+        element.className = "message";
     }
 
-
-    // =========================================================
-    // CARD MANAGEMENT
-    // =========================================================
-
-    function showOnly(card) {
+    function showAuthCard(card) {
 
         loginCard.classList.add("hidden");
         forgotCard.classList.add("hidden");
         updatePasswordCard.classList.add("hidden");
-        accountCard.classList.add("hidden");
 
         card.classList.remove("hidden");
 
     }
 
+    function openDashboard() {
 
-    // =========================================================
-    // APP URL
-    // =========================================================
+        authApp.style.display = "none";
+        dashboardApp.classList.add("visible");
 
-    // آدرس اختصاصی صفحه بازیابی رمز
-    const APP_URL =
-        window.location.origin +
-        window.location.pathname +
-        "?reset-password=1";
+    }
+
+    function closeDashboard() {
+
+        dashboardApp.classList.remove("visible");
+        authApp.style.display = "flex";
+
+        showAuthCard(loginCard);
+
+    }
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
 
 
-    // =========================================================
-    // LOGIN
-    // =========================================================
+    /* =========================================================
+       ACCOUNT / DASHBOARD
+       ========================================================= */
+
+    async function loadAccountInfo() {
+
+        const { data, error } =
+            await supabaseClient.rpc("get_my_account_info");
+
+        if (error) {
+
+            console.error(error);
+
+            openDashboard();
+
+            showMessage(
+                document.getElementById("dashboardMessage"),
+                "ورود انجام شد، اما دریافت اطلاعات حساب با خطا مواجه شد.",
+                "error"
+            );
+
+            return;
+
+        }
+
+        const firstName = data?.first_name || "";
+        const lastName = data?.last_name || "";
+
+        const fullName =
+            (firstName + " " + lastName).trim() ||
+            "مدیر سامانه";
+
+        const schoolName =
+            data?.school_name ||
+            "مدرسه من";
+
+        const roles =
+            data?.roles || [];
+
+        const roleNames =
+            roles
+                .map(item => item.role || "")
+                .filter(Boolean);
+
+        document.getElementById("dashboardUserName").textContent =
+            fullName;
+
+        document.getElementById("dashboardSchool").textContent =
+            schoolName;
+
+        document.getElementById("dashboardUserRole").textContent =
+            roleNames.length
+                ? roleNames.join("، ")
+                : "کاربر سامانه";
+
+        document.getElementById("dashboardAvatar").textContent =
+            fullName.charAt(0) || "م";
+
+        document.getElementById("welcomeTitle").textContent =
+            "خوش آمدید " + fullName + " 👋";
+
+        openDashboard();
+
+    }
+
+
+    /* =========================================================
+       LOGIN
+       ========================================================= */
 
     loginForm.addEventListener("submit", async function(event) {
 
@@ -1604,26 +1388,21 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
         const button =
             document.getElementById("loginButton");
 
-
         hideMessage(
             document.getElementById("loginMessage")
         );
 
-
+        button.disabled = true;
         button.textContent = "در حال ورود...";
-        loginForm.classList.add("loading");
 
-
-        const { data, error } =
+        const { error } =
             await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
+                email,
+                password
             });
 
-
-        loginForm.classList.remove("loading");
+        button.disabled = false;
         button.textContent = "ورود";
-
 
         if (error) {
 
@@ -1638,201 +1417,620 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
             return;
         }
 
-
-        showMessage(
-            document.getElementById("loginMessage"),
-            "ورود با موفقیت انجام شد.",
-            "success"
-        );
-
-
         await loadAccountInfo();
 
     });
 
 
-    // =========================================================
-    // LOAD ACCOUNT INFO
-    // =========================================================
+    /* =========================================================
+       LOGOUT
+       ========================================================= */
 
-    async function loadAccountInfo() {
+    document
+        .getElementById("dashboardLogoutButton")
+        .addEventListener("click", async function() {
 
-        const {
-            data,
-            error
-        } = await supabaseClient.rpc("get_my_account_info");
+            await supabaseClient.auth.signOut();
 
-        if (error) {
-            console.error(error);
+            closeDashboard();
 
-            showOnly(accountCard);
+            document.getElementById("loginPassword").value = "";
 
             showMessage(
-                document.getElementById("dashboardMessage"),
-                "ورود موفق بود، اما دریافت اطلاعات حساب با خطا مواجه شد.",
-                "error"
+                document.getElementById("loginMessage"),
+                "از حساب خارج شدید.",
+                "success"
             );
+
+        });
+
+
+    /* =========================================================
+       DASHBOARD NAVIGATION
+       ========================================================= */
+
+    const moduleInfo = {
+
+        dashboard: {
+            title: "داشبورد",
+            icon: "📊"
+        },
+
+        students: {
+            title: "دانش‌آموزان",
+            icon: "👨‍🎓"
+        },
+
+        teachers: {
+            title: "معلمان",
+            icon: "👨‍🏫"
+        },
+
+        classes: {
+            title: "کلاس‌ها",
+            icon: "🏫"
+        },
+
+        subjects: {
+            title: "دروس",
+            icon: "📚"
+        },
+
+        attendance: {
+            title: "حضور و غیاب",
+            icon: "📋"
+        },
+
+        grades: {
+            title: "نمرات و کارنامه",
+            icon: "📝"
+        },
+
+        exams: {
+            title: "آزمون آنلاین",
+            icon: "🧪"
+        },
+
+        discipline: {
+            title: "انضباط",
+            icon: "⚠️"
+        },
+
+        chat: {
+            title: "پیام‌ها",
+            icon: "💬"
+        },
+
+        online: {
+            title: "کلاس آنلاین",
+            icon: "🎥"
+        }
+
+    };
+
+
+    function openModule(moduleName) {
+
+        const home =
+            document.getElementById("dashboardHome");
+
+        const studentsPage =
+            document.getElementById("studentsPage");
+
+        const otherPage =
+            document.getElementById("otherModulePage");
+
+        home.classList.add("hidden");
+        studentsPage.classList.remove("active");
+        otherPage.classList.remove("active");
+
+        document
+            .querySelectorAll(".nav-item")
+            .forEach(function(item) {
+                item.classList.remove("active");
+            });
+
+        const nav =
+            document.querySelector(
+                '.nav-item[data-module="' + moduleName + '"]'
+            );
+
+        if (nav) {
+            nav.classList.add("active");
+        }
+
+        if (moduleName === "dashboard") {
+
+            home.classList.remove("hidden");
 
             return;
         }
 
-        console.log("Account info:", data);
+        if (moduleName === "students") {
 
-        const firstName = data?.first_name || "";
-        const lastName = data?.last_name || "";
-        const fullName = (firstName + " " + lastName).trim() || "مدیر سامانه";
-        const schoolName = data?.school_name || "مدرسه من";
-        const roles = data?.roles || [];
+            studentsPage.classList.add("active");
 
-        document.getElementById("dashboardUserName").textContent = fullName;
-        document.getElementById("dashboardSchool").textContent = schoolName;
+            loadStudents();
 
-        const roleNames = roles
-            .map(function(item) {
-                return item.role || "";
-            })
-            .filter(Boolean);
+            return;
+        }
 
-        document.getElementById("dashboardUserRole").textContent =
-            roleNames.length ? roleNames.join("، ") : "کاربر سامانه";
+        const info =
+            moduleInfo[moduleName] || {
+                title: "بخش سامانه",
+                icon: "⚙️"
+            };
 
-        document.getElementById("dashboardAvatar").textContent =
-            fullName.charAt(0) || "م";
+        document.getElementById("otherModuleTitle").textContent =
+            info.icon + " " + info.title;
 
-        document.getElementById("welcomeTitle").textContent =
-            "خوش آمدید " + fullName + " 👋";
+        document.getElementById("otherModuleIcon").textContent =
+            info.icon;
 
-        showOnly(accountCard);
+        document.getElementById("otherModuleSubtitle").textContent =
+            "مدیریت بخش " + info.title;
+
+        otherPage.classList.add("active");
+
     }
 
 
-    // =========================================================
-    // FORGOT PASSWORD
-    // =========================================================
+    document
+        .querySelectorAll("[data-module]")
+        .forEach(function(item) {
 
-    forgotButton.addEventListener("click", function() {
+            item.addEventListener("click", function(event) {
 
-        const loginEmail =
-            document.getElementById("loginEmail").value.trim();
+                event.preventDefault();
 
-        document.getElementById("forgotEmail").value =
-            loginEmail;
-
-        hideMessage(
-            document.getElementById("forgotMessage")
-        );
-
-        showOnly(forgotCard);
-
-    });
-
-
-    // =========================================================
-    // SEND PASSWORD RECOVERY EMAIL
-    // =========================================================
-
-    forgotForm.addEventListener("submit", async function(event) {
-
-        event.preventDefault();
-
-
-        const email =
-            document.getElementById("forgotEmail")
-                .value
-                .trim();
-
-
-        const button =
-            document.getElementById("forgotSubmit");
-
-
-        hideMessage(
-            document.getElementById("forgotMessage")
-        );
-
-
-        button.textContent =
-            "در حال ارسال...";
-
-        forgotForm.classList.add("loading");
-
-
-        const {
-            error
-        } =
-            await supabaseClient.auth
-                .resetPasswordForEmail(
-                    email,
-                    {
-                        redirectTo: APP_URL
-                    }
+                openModule(
+                    item.getAttribute("data-module")
                 );
 
+            });
 
-        forgotForm.classList.remove("loading");
+        });
 
-        button.textContent =
-            "ارسال لینک بازیابی";
+
+    /* =========================================================
+       STUDENTS
+       ========================================================= */
+
+    let allStudents = [];
+
+
+    async function loadStudents() {
+
+        const tableBody =
+            document.getElementById("studentsTableBody");
+
+        const count =
+            document.getElementById("studentsCount");
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    <div class="empty-state">
+                        در حال دریافت دانش‌آموزان...
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        count.textContent = "در حال دریافت...";
+
+        hideMessage(
+            document.getElementById("studentsPageMessage")
+        );
+
+
+        const { data: students, error } =
+            await supabaseClient
+                .from("students")
+                .select("id, user_id, school_id")
+                .order("id", { ascending: false });
 
 
         if (error) {
 
             console.error(error);
 
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            دریافت اطلاعات با خطا مواجه شد.
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            count.textContent = "خطا";
+
             showMessage(
-                document.getElementById("forgotMessage"),
-                "ارسال لینک بازیابی انجام نشد: " +
-                error.message,
+                document.getElementById("studentsPageMessage"),
+                "دریافت لیست دانش‌آموزان انجام نشد. اگر هنوز دانش‌آموزی ثبت نشده باشد، این پیام باید بعداً با فرم ثبت مدیریت شود.",
                 "error"
             );
 
             return;
+
         }
 
 
-        showMessage(
-            document.getElementById("forgotMessage"),
-            "اگر این ایمیل در سامانه ثبت شده باشد، لینک بازیابی برای آن ارسال می‌شود. ایمیل خود را بررسی کنید.",
-            "success"
+        allStudents = students || [];
+
+
+        if (!allStudents.length) {
+
+            renderStudents([]);
+
+            return;
+
+        }
+
+
+        const userIds =
+            allStudents
+                .map(student => student.user_id)
+                .filter(Boolean);
+
+
+        let profiles = [];
+
+
+        if (userIds.length) {
+
+            const { data: profileData, error: profileError } =
+                await supabaseClient
+                    .from("profiles")
+                    .select(
+                        "id, first_name, last_name, mobile, national_code, is_active"
+                    )
+                    .in("id", userIds);
+
+
+            if (profileError) {
+                console.error(profileError);
+            } else {
+                profiles = profileData || [];
+            }
+
+        }
+
+
+        const profileMap = {};
+
+
+        profiles.forEach(function(profile) {
+            profileMap[profile.id] = profile;
+        });
+
+
+        allStudents =
+            allStudents.map(function(student) {
+
+                const profile =
+                    profileMap[student.user_id] || {};
+
+                return {
+
+                    ...student,
+
+                    first_name:
+                        profile.first_name || "—",
+
+                    last_name:
+                        profile.last_name || "",
+
+                    mobile:
+                        profile.mobile || "—",
+
+                    national_code:
+                        profile.national_code || "—",
+
+                    is_active:
+                        profile.is_active !== false
+
+                };
+
+            });
+
+
+        renderStudents(allStudents);
+
+        document.getElementById("studentStat").textContent =
+            allStudents.length;
+
+    }
+
+
+    function renderStudents(students) {
+
+        const tableBody =
+            document.getElementById("studentsTableBody");
+
+        const count =
+            document.getElementById("studentsCount");
+
+
+        count.textContent =
+            students.length + " دانش‌آموز";
+
+
+        if (!students.length) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <div class="icon">👨‍🎓</div>
+                            <div>هنوز دانش‌آموزی ثبت نشده یا نتیجه‌ای پیدا نشد.</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        tableBody.innerHTML =
+            students
+                .map(function(student, index) {
+
+                    const fullName =
+                        (
+                            (student.first_name || "") +
+                            " " +
+                            (student.last_name || "")
+                        ).trim() ||
+                        "بدون نام";
+
+
+                    const statusClass =
+                        student.is_active
+                            ? "active"
+                            : "inactive";
+
+
+                    const statusText =
+                        student.is_active
+                            ? "فعال"
+                            : "غیرفعال";
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${index + 1}
+                            </td>
+
+                            <td>
+
+                                <div class="student-name">
+                                    ${escapeHtml(fullName)}
+                                </div>
+
+                                <div class="student-id">
+                                    ${escapeHtml(student.user_id || "بدون حساب کاربری")}
+                                </div>
+
+                            </td>
+
+                            <td>
+                                ${escapeHtml(student.national_code)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(student.mobile)}
+                            </td>
+
+                            <td>
+                                <span class="status ${statusClass}">
+                                    ${statusText}
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+
+                })
+                .join("");
+
+    }
+
+
+    function filterStudents() {
+
+        const query =
+            document
+                .getElementById("studentSearchInput")
+                .value
+                .trim()
+                .toLowerCase();
+
+
+        if (!query) {
+
+            renderStudents(allStudents);
+
+            return;
+
+        }
+
+
+        const filtered =
+            allStudents.filter(function(student) {
+
+                const text =
+                    [
+                        student.first_name,
+                        student.last_name,
+                        student.national_code,
+                        student.mobile
+                    ]
+                    .join(" ")
+                    .toLowerCase();
+
+
+                return text.includes(query);
+
+            });
+
+
+        renderStudents(filtered);
+
+    }
+
+
+    document
+        .getElementById("studentSearchInput")
+        .addEventListener(
+            "input",
+            filterStudents
         );
 
-    });
+
+    document
+        .getElementById("refreshStudentsButton")
+        .addEventListener(
+            "click",
+            loadStudents
+        );
 
 
-    // =========================================================
-    // BACK TO LOGIN
-    // =========================================================
+    document
+        .getElementById("addStudentButton")
+        .addEventListener(
+            "click",
+            function() {
 
-    backToLoginFromForgot.addEventListener(
-        "click",
-        function() {
+                showMessage(
+                    document.getElementById("studentsPageMessage"),
+                    "فرم افزودن دانش‌آموز را در مرحله بعد می‌سازیم.",
+                    "info"
+                );
 
-            hideMessage(
-                document.getElementById("loginMessage")
-            );
-
-            showOnly(loginCard);
-
-        }
-    );
+            }
+        );
 
 
-    // =========================================================
-    // PASSWORD RECOVERY EVENT
-    // =========================================================
+    /* =========================================================
+       FORGOT PASSWORD
+       ========================================================= */
+
+    const APP_URL =
+        window.location.origin +
+        window.location.pathname +
+        "?reset-password=1";
+
+
+    document
+        .getElementById("forgotButton")
+        .addEventListener(
+            "click",
+            function() {
+
+                document.getElementById("forgotEmail").value =
+                    document.getElementById("loginEmail").value.trim();
+
+                hideMessage(
+                    document.getElementById("forgotMessage")
+                );
+
+                showAuthCard(forgotCard);
+
+            }
+        );
+
+
+    document
+        .getElementById("backToLoginFromForgot")
+        .addEventListener(
+            "click",
+            function() {
+                showAuthCard(loginCard);
+            }
+        );
+
+
+    document
+        .getElementById("forgotForm")
+        .addEventListener(
+            "submit",
+            async function(event) {
+
+                event.preventDefault();
+
+                const email =
+                    document
+                        .getElementById("forgotEmail")
+                        .value
+                        .trim();
+
+                const button =
+                    document.getElementById("forgotSubmit");
+
+                button.disabled = true;
+                button.textContent = "در حال ارسال...";
+
+                hideMessage(
+                    document.getElementById("forgotMessage")
+                );
+
+
+                const { error } =
+                    await supabaseClient.auth.resetPasswordForEmail(
+                        email,
+                        {
+                            redirectTo: APP_URL
+                        }
+                    );
+
+
+                button.disabled = false;
+                button.textContent = "ارسال لینک بازیابی";
+
+
+                if (error) {
+
+                    showMessage(
+                        document.getElementById("forgotMessage"),
+                        "ارسال لینک بازیابی انجام نشد: " + error.message,
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                showMessage(
+                    document.getElementById("forgotMessage"),
+                    "لینک بازیابی ارسال شد. ایمیل خود را بررسی کنید.",
+                    "success"
+                );
+
+            }
+        );
+
+
+    /* =========================================================
+       PASSWORD RECOVERY
+       ========================================================= */
 
     supabaseClient.auth.onAuthStateChange(
-        async function(event, session) {
-
-            console.log(
-                "Auth event:",
-                event
-            );
-
+        function(event) {
 
             if (event === "PASSWORD_RECOVERY") {
 
-                showOnly(updatePasswordCard);
+                authApp.style.display = "flex";
+                dashboardApp.classList.remove("visible");
+
+                showAuthCard(updatePasswordCard);
 
                 showMessage(
                     document.getElementById("updateMessage"),
@@ -1846,512 +2044,116 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
     );
 
 
-    // =========================================================
-    // UPDATE PASSWORD
-    // =========================================================
+    document
+        .getElementById("updatePasswordForm")
+        .addEventListener(
+            "submit",
+            async function(event) {
 
-    updatePasswordForm.addEventListener(
-        "submit",
-        async function(event) {
+                event.preventDefault();
 
-            event.preventDefault();
+                const password =
+                    document.getElementById("newPassword").value;
 
-
-            const password =
-                document.getElementById("newPassword")
-                    .value;
-
-            const confirmPassword =
-                document.getElementById("confirmPassword")
-                    .value;
+                const confirm =
+                    document.getElementById("confirmPassword").value;
 
 
-            hideMessage(
-                document.getElementById("updateMessage")
-            );
-
-
-            if (password.length < 6) {
-
-                showMessage(
-                    document.getElementById("updateMessage"),
-                    "رمز عبور باید حداقل 6 کاراکتر باشد.",
-                    "error"
-                );
-
-                return;
-            }
-
-
-            if (password !== confirmPassword) {
-
-                showMessage(
-                    document.getElementById("updateMessage"),
-                    "رمزهای عبور یکسان نیستند.",
-                    "error"
-                );
-
-                return;
-            }
-
-
-            const button =
-                document.getElementById(
-                    "updatePasswordButton"
+                hideMessage(
+                    document.getElementById("updateMessage")
                 );
 
 
-            button.textContent =
-                "در حال ذخیره...";
-
-            updatePasswordForm.classList.add("loading");
-
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient.auth.updateUser({
-                    password: password
-                });
-
-
-            updatePasswordForm.classList.remove("loading");
-
-            button.textContent =
-                "ذخیره رمز جدید";
-
-
-            if (error) {
-
-                console.error(error);
-
-                showMessage(
-                    document.getElementById("updateMessage"),
-                    "تغییر رمز انجام نشد: " +
-                    error.message,
-                    "error"
-                );
-
-                return;
-            }
-
-
-            showMessage(
-                document.getElementById("updateMessage"),
-                "رمز عبور با موفقیت تغییر کرد.",
-                "success"
-            );
-
-            document.getElementById("newPassword")
-                .value = "";
-
-            document.getElementById("confirmPassword")
-                .value = "";
-
-            // پایان Session بازیابی و بازگشت به صفحه ورود
-            await supabaseClient.auth.signOut();
-
-            setTimeout(
-                function() {
-
-                    window.history.replaceState(
-                        {},
-                        document.title,
-                        window.location.pathname
-                    );
-
-                    showOnly(loginCard);
+                if (password.length < 6) {
 
                     showMessage(
-                        document.getElementById("loginMessage"),
-                        "رمز عبور با موفقیت تغییر کرد. اکنون با رمز جدید وارد شوید.",
-                        "success"
+                        document.getElementById("updateMessage"),
+                        "رمز عبور باید حداقل 6 کاراکتر باشد.",
+                        "error"
                     );
 
-                },
-                1200
-            );
+                    return;
 
-        }
-    );
+                }
 
 
-    // =========================================================
-    // LOGOUT
-    // =========================================================
+                if (password !== confirm) {
 
-    document.getElementById("dashboardLogoutButton").addEventListener(
-        "click",
-        async function() {
+                    showMessage(
+                        document.getElementById("updateMessage"),
+                        "رمزهای عبور یکسان نیستند.",
+                        "error"
+                    );
 
-            const {
-                error
-            } =
+                    return;
+
+                }
+
+
+                const button =
+                    document.getElementById("updatePasswordButton");
+
+                button.disabled = true;
+                button.textContent = "در حال ذخیره...";
+
+
+                const { error } =
+                    await supabaseClient.auth.updateUser({
+                        password
+                    });
+
+
+                button.disabled = false;
+                button.textContent = "ذخیره رمز جدید";
+
+
+                if (error) {
+
+                    showMessage(
+                        document.getElementById("updateMessage"),
+                        "تغییر رمز انجام نشد: " + error.message,
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
                 await supabaseClient.auth.signOut();
 
+                document.getElementById("newPassword").value = "";
+                document.getElementById("confirmPassword").value = "";
 
-            if (error) {
+                showAuthCard(loginCard);
 
-                console.error(error);
+                showMessage(
+                    document.getElementById("loginMessage"),
+                    "رمز عبور با موفقیت تغییر کرد. اکنون وارد شوید.",
+                    "success"
+                );
 
-                return;
             }
-
-
-            document.getElementById("loginEmail")
-                .value = "";
-
-            document.getElementById("loginPassword")
-                .value = "";
-
-
-            showOnly(loginCard);
-
-        }
-    );
-
-
-    // =========================================================
-    // DASHBOARD NAVIGATION
-    // =========================================================
-
-    function openDashboardPage(moduleName) {
-
-        const home = document.getElementById("dashboardHome");
-        const studentsPage = document.getElementById("studentsPage");
-
-        if (home) home.classList.add("hidden");
-        if (studentsPage) studentsPage.classList.remove("active");
-
-        document.querySelectorAll(".nav-item").forEach(function(nav) {
-            nav.classList.remove("active");
-        });
-
-        const matchingNav =
-            document.querySelector('.nav-item[data-module="' + moduleName + '"]');
-
-        if (matchingNav) {
-            matchingNav.classList.add("active");
-        }
-
-        if (moduleName === "dashboard") {
-
-            if (home) home.classList.remove("hidden");
-
-            hideMessage(
-                document.getElementById("dashboardMessage")
-            );
-
-            return;
-        }
-
-        if (moduleName === "students") {
-
-            if (studentsPage) {
-                studentsPage.classList.add("active");
-                loadStudents();
-            }
-
-            return;
-        }
-
-        showMessage(
-            document.getElementById("dashboardMessage"),
-            "بخش «" + getModuleTitle(moduleName) + "» در مرحله بعد ساخته می‌شود.",
-            "info"
         );
-    }
 
 
-    document.querySelectorAll("[data-module]").forEach(function(item) {
-
-        item.addEventListener("click", function(event) {
-
-            event.preventDefault();
-
-            const moduleName =
-                item.getAttribute("data-module");
-
-            openDashboardPage(moduleName);
-        });
-
-    });
-
-
-    function getModuleTitle(moduleName) {
-
-        const titles = {
-            students: "دانش‌آموزان",
-            teachers: "معلمان",
-            classes: "کلاس‌ها",
-            subjects: "دروس",
-            attendance: "حضور و غیاب",
-            grades: "نمرات و کارنامه",
-            exams: "آزمون آنلاین",
-            discipline: "انضباط",
-            chat: "پیام‌ها",
-            online: "کلاس آنلاین"
-        };
-
-        return titles[moduleName] || "این بخش";
-    }
-
-
-    // =========================================================
-    // STUDENTS MANAGEMENT
-    // =========================================================
-
-    let allStudents = [];
-
-
-    async function loadStudents() {
-
-        const tableBody =
-            document.getElementById("studentsTableBody");
-
-        const countElement =
-            document.getElementById("studentsCount");
-
-        tableBody.innerHTML =
-            '<tr><td colspan="5" class="loading-row">در حال دریافت دانش‌آموزان...</td></tr>';
-
-        countElement.textContent = "در حال دریافت اطلاعات...";
-
-        const {
-            data: students,
-            error: studentsError
-        } = await supabaseClient
-            .from("students")
-            .select("id, user_id, school_id")
-            .order("id", { ascending: false });
-
-        if (studentsError) {
-
-            console.error(studentsError);
-
-            tableBody.innerHTML =
-                '<tr><td colspan="5" class="loading-row">دریافت دانش‌آموزان با خطا مواجه شد.</td></tr>';
-
-            countElement.textContent = "خطا در دریافت اطلاعات";
-
-            showMessage(
-                document.getElementById("studentsPageMessage"),
-                "خطا در دریافت لیست دانش‌آموزان. دسترسی دیتابیس را بررسی کنید.",
-                "error"
-            );
-
-            return;
-        }
-
-        allStudents = students || [];
-
-        if (!allStudents.length) {
-            renderStudents([]);
-            return;
-        }
-
-        const userIds = allStudents
-            .map(function(student) {
-                return student.user_id;
-            })
-            .filter(Boolean);
-
-        let profiles = [];
-
-        if (userIds.length) {
-
-            const {
-                data: profileData,
-                error: profilesError
-            } = await supabaseClient
-                .from("profiles")
-                .select("id, first_name, last_name, mobile, national_code, is_active")
-                .in("id", userIds);
-
-            if (profilesError) {
-                console.error(profilesError);
-            } else {
-                profiles = profileData || [];
-            }
-        }
-
-        const profileMap = {};
-
-        profiles.forEach(function(profile) {
-            profileMap[profile.id] = profile;
-        });
-
-        allStudents = allStudents.map(function(student) {
-
-            const profile =
-                profileMap[student.user_id] || {};
-
-            return {
-                ...student,
-                first_name: profile.first_name || "—",
-                last_name: profile.last_name || "",
-                mobile: profile.mobile || "—",
-                national_code: profile.national_code || "—",
-                is_active: profile.is_active !== false
-            };
-
-        });
-
-        renderStudents(allStudents);
-
-        hideMessage(
-            document.getElementById("studentsPageMessage")
-        );
-    }
-
-
-    function renderStudents(students) {
-
-        const tableBody =
-            document.getElementById("studentsTableBody");
-
-        const countElement =
-            document.getElementById("studentsCount");
-
-        countElement.textContent =
-            students.length + " دانش‌آموز";
-
-        if (!students.length) {
-
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="5">
-                        <div class="empty-state">
-                            <div class="empty-icon">👨‍🎓</div>
-                            <div>دانش‌آموزی مطابق جستجو پیدا نشد.</div>
-                        </div>
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-        tableBody.innerHTML = students.map(function(student, index) {
-
-            const fullName =
-                ((student.first_name || "") + " " + (student.last_name || "")).trim()
-                || "بدون نام";
-
-            const statusClass =
-                student.is_active
-                    ? "status-active"
-                    : "status-inactive";
-
-            const statusText =
-                student.is_active
-                    ? "فعال"
-                    : "غیرفعال";
-
-            return `
-                <tr>
-                    <td>${index + 1}</td>
-
-                    <td>
-                        <div class="student-name-cell">${escapeHtml(fullName)}</div>
-                        <div class="student-sub">${escapeHtml(student.user_id || "بدون حساب کاربری")}</div>
-                    </td>
-
-                    <td>${escapeHtml(student.national_code)}</td>
-
-                    <td>${escapeHtml(student.mobile)}</td>
-
-                    <td>
-                        <span class="status-badge ${statusClass}">
-                            ${statusText}
-                        </span>
-                    </td>
-                </tr>
-            `;
-
-        }).join("");
-    }
-
-
-    function escapeHtml(value) {
-
-        return String(value ?? "")
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-
-    function filterStudents() {
-
-        const query =
-            document.getElementById("studentSearchInput")
-                .value
-                .trim()
-                .toLowerCase();
-
-        if (!query) {
-            renderStudents(allStudents);
-            return;
-        }
-
-        const filtered =
-            allStudents.filter(function(student) {
-
-                const text = [
-                    student.first_name,
-                    student.last_name,
-                    student.national_code,
-                    student.mobile
-                ]
-                .join(" ")
-                .toLowerCase();
-
-                return text.includes(query);
-            });
-
-        renderStudents(filtered);
-    }
-
-
-    document.getElementById("studentSearchInput")
-        .addEventListener("input", filterStudents);
-
-
-    document.getElementById("refreshStudentsButton")
-        .addEventListener("click", loadStudents);
-
-
-    document.getElementById("addStudentButton")
-        .addEventListener("click", function() {
-
-            showMessage(
-                document.getElementById("studentsPageMessage"),
-                "فرم افزودن دانش‌آموز را در مرحله بعد می‌سازیم؛ ابتدا لیست دانش‌آموزان را کامل و پایدار می‌کنیم.",
-                "info"
-            );
-
-        });
-
-
-        // =========================================================
-    // INITIAL SESSION CHECK
-    // =========================================================
+    /* =========================================================
+       INITIAL SESSION
+       ========================================================= */
 
     async function initializeApp() {
 
-        // اگر کاربر از لینک بازیابی رمز وارد شده باشد،
-        // فرم تغییر رمز را نمایش بده؛ حتی اگر قبلاً Session داشته باشد.
         const isResetPasswordPage =
             new URLSearchParams(window.location.search)
                 .get("reset-password") === "1";
 
+
         if (isResetPasswordPage) {
 
-            showOnly(updatePasswordCard);
+            authApp.style.display = "flex";
+            dashboardApp.classList.remove("visible");
+
+            showAuthCard(updatePasswordCard);
 
             showMessage(
                 document.getElementById("updateMessage"),
@@ -2360,22 +2162,15 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
             );
 
             return;
+
         }
 
-        const {
-            data
-        } =
+
+        const { data } =
             await supabaseClient.auth.getSession();
 
-        const session =
-            data?.session;
 
-        /*
-         * اگر کاربر قبلاً وارد شده باشد،
-         * اطلاعات حساب را نمایش می‌دهیم.
-         */
-
-        if (session) {
+        if (data?.session) {
 
             await loadAccountInfo();
 
@@ -2383,10 +2178,6 @@ const SUPABASE_URL = "https://ebimojeubatymlvpthor.supabase.co";
 
     }
 
-
-    // =========================================================
-    // START APP
-    // =========================================================
 
     initializeApp();
 
