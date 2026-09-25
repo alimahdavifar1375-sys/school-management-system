@@ -1796,6 +1796,83 @@
                     </section>
 
 
+                    <!-- DISCIPLINE -->
+                    <section id="disciplinePage" class="module-page">
+                        <div class="page-header">
+                            <div>
+                                <h2>⚠️ مدیریت انضباط</h2>
+                                <p>ثبت، ویرایش و مشاهده سوابق انضباطی دانش‌آموزان</p>
+                            </div>
+                            <div class="page-actions">
+                                <button id="refreshDisciplineButton" class="small-btn">🔄 بروزرسانی</button>
+                            </div>
+                        </div>
+
+                        <div id="disciplinePageMessage" class="message"></div>
+
+                        <div class="table-card" style="padding:18px;margin-bottom:15px">
+                            <h3 style="margin:0 0 15px">➕ ثبت مورد انضباطی</h3>
+                            <input type="hidden" id="disciplineRecordId">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="disciplineClass">کلاس <span class="required">*</span></label>
+                                    <select id="disciplineClass"><option value="">در حال دریافت کلاس‌ها...</option></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="disciplineStudent">دانش‌آموز <span class="required">*</span></label>
+                                    <select id="disciplineStudent" disabled><option value="">ابتدا کلاس را انتخاب کنید</option></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="disciplineType">نوع مورد <span class="required">*</span></label>
+                                    <input id="disciplineType" type="text" placeholder="مثلاً: غیبت، تأخیر، انضباطی...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="disciplineTitle">عنوان <span class="required">*</span></label>
+                                    <input id="disciplineTitle" type="text" placeholder="عنوان مورد انضباطی">
+                                </div>
+                                <div class="form-group">
+                                    <label for="disciplineSeverity">شدت</label>
+                                    <select id="disciplineSeverity">
+                                        <option value="low">کم</option>
+                                        <option value="normal" selected>عادی</option>
+                                        <option value="high">زیاد</option>
+                                        <option value="critical">بحرانی</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="disciplineDate">تاریخ <span class="required">*</span></label>
+                                    <input id="disciplineDate" type="date">
+                                </div>
+                                <div class="form-group full">
+                                    <label for="disciplineDescription">توضیحات</label>
+                                    <textarea id="disciplineDescription" rows="3" placeholder="توضیحات تکمیلی..."></textarea>
+                                </div>
+                            </div>
+                            <div class="page-actions" style="margin-top:15px">
+                                <button id="saveDisciplineButton" class="small-btn success">💾 ثبت مورد</button>
+                                <button id="cancelDisciplineEditButton" class="small-btn" style="display:none">انصراف از ویرایش</button>
+                            </div>
+                        </div>
+
+                        <div class="toolbar" style="flex-wrap:wrap">
+                            <select id="disciplineFilterClass"><option value="">همه کلاس‌ها</option></select>
+                            <select id="disciplineFilterStudent" disabled><option value="">همه دانش‌آموزان</option></select>
+                            <input id="disciplineFromDate" type="date">
+                            <input id="disciplineToDate" type="date">
+                            <button id="loadDisciplineButton" class="small-btn">🔎 نمایش سوابق</button>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-scroll">
+                                <table class="grades-history-table">
+                                    <thead><tr><th>#</th><th>دانش‌آموز</th><th>نوع</th><th>عنوان</th><th>شدت</th><th>تاریخ</th><th>توضیحات</th><th>ثبت‌کننده</th><th>عملیات</th></tr></thead>
+                                    <tbody id="disciplineTableBody"><tr><td colspan="9"><div class="empty-state">در حال دریافت سوابق...</div></td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+
                     <!-- OTHER MODULES -->
                     <section id="otherModulePage" class="module-page">
 
@@ -2425,6 +2502,9 @@
         const gradesPage =
             document.getElementById("gradesPage");
 
+        const disciplinePage =
+            document.getElementById("disciplinePage");
+
         const otherPage =
             document.getElementById("otherModulePage");
 
@@ -2436,6 +2516,7 @@
         teachersPage.classList.remove("active");
         attendancePage.classList.remove("active");
         gradesPage.classList.remove("active");
+        disciplinePage.classList.remove("active");
         otherPage.classList.remove("active");
 
         document
@@ -2517,6 +2598,15 @@
             return;
         }
 
+        if (moduleName === "discipline") {
+            disciplinePage.classList.add("active");
+            loadDisciplineModule().catch(function(error) {
+                console.error("دریافت انضباط انجام نشد:", error);
+                showMessage(document.getElementById("disciplinePageMessage"), "دریافت اطلاعات انضباط انجام نشد: " + error.message, "error");
+            });
+            return;
+        }
+
         const info =
             moduleInfo[moduleName] || {
                 title: "بخش سامانه",
@@ -2554,6 +2644,198 @@
         });
 
 
+
+
+    /* =========================================================
+       DISCIPLINE MANAGEMENT
+       ========================================================= */
+
+    let disciplineClasses = [];
+    let disciplineStudents = [];
+    let disciplineRecords = [];
+
+    const disciplineSeverityLabels = {
+        low: "کم",
+        normal: "عادی",
+        high: "زیاد",
+        critical: "بحرانی"
+    };
+
+    function setDisciplineSelect(select, items, placeholder, labelFn) {
+        select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>` +
+            items.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(labelFn(item))}</option>`).join("");
+        select.disabled = false;
+    }
+
+    async function loadDisciplineClasses() {
+        const selects = [document.getElementById("disciplineClass"), document.getElementById("disciplineFilterClass")];
+        selects.forEach(s => { s.disabled = true; s.innerHTML = `<option value="">در حال دریافت کلاس‌ها...</option>`; });
+        const { data, error } = await supabaseClient.rpc("get_my_school_classes");
+        if (error) throw error;
+        disciplineClasses = data || [];
+        setDisciplineSelect(selects[0], disciplineClasses, disciplineClasses.length ? "انتخاب کلاس" : "کلاسی ثبت نشده است", c => `${c.name}${c.grade ? " — " + c.grade : ""}${c.section ? " " + c.section : ""}`);
+        setDisciplineSelect(selects[1], disciplineClasses, "همه کلاس‌ها", c => `${c.name}${c.grade ? " — " + c.grade : ""}${c.section ? " " + c.section : ""}`);
+    }
+
+    async function loadDisciplineStudents(classId, targetId, allLabel = "همه دانش‌آموزان") {
+        const select = document.getElementById(targetId);
+        select.disabled = true;
+        select.innerHTML = `<option value="">در حال دریافت دانش‌آموزان...</option>`;
+        if (!classId) {
+            select.innerHTML = `<option value="">${escapeHtml(allLabel === "همه دانش‌آموزان" ? "همه دانش‌آموزان" : "ابتدا کلاس را انتخاب کنید")}</option>`;
+            select.disabled = targetId === "disciplineStudent";
+            return;
+        }
+        const { data, error } = await supabaseClient.rpc("get_class_students_for_grades", { p_class_id: classId });
+        if (error) throw error;
+        disciplineStudents = data || [];
+        setDisciplineSelect(select, disciplineStudents, allLabel, st => st.student_name || `${st.first_name || ""} ${st.last_name || ""}`.trim());
+    }
+
+    function resetDisciplineForm() {
+        document.getElementById("disciplineRecordId").value = "";
+        document.getElementById("disciplineClass").value = "";
+        document.getElementById("disciplineStudent").innerHTML = `<option value="">ابتدا کلاس را انتخاب کنید</option>`;
+        document.getElementById("disciplineStudent").disabled = true;
+        document.getElementById("disciplineType").value = "";
+        document.getElementById("disciplineTitle").value = "";
+        document.getElementById("disciplineDescription").value = "";
+        document.getElementById("disciplineSeverity").value = "normal";
+        document.getElementById("disciplineDate").value = new Date().toISOString().slice(0,10);
+        document.getElementById("saveDisciplineButton").textContent = "💾 ثبت مورد";
+        document.getElementById("cancelDisciplineEditButton").style.display = "none";
+    }
+
+    async function loadDisciplineRecords() {
+        const classId = document.getElementById("disciplineFilterClass").value;
+        const studentId = document.getElementById("disciplineFilterStudent").value;
+        const fromDate = document.getElementById("disciplineFromDate").value || null;
+        const toDate = document.getElementById("disciplineToDate").value || null;
+        const body = document.getElementById("disciplineTableBody");
+        body.innerHTML = `<tr><td colspan="9"><div class="empty-state">در حال دریافت سوابق...</div></td></tr>`;
+        const { data, error } = await supabaseClient.rpc("get_disciplinary_records", {
+            p_student_id: studentId || null,
+            p_from_date: fromDate,
+            p_to_date: toDate
+        });
+        if (error) throw error;
+        disciplineRecords = data || [];
+        const filtered = classId ? disciplineRecords.filter(r => disciplineStudents.some(st => st.id === r.student_id || st.student_id === r.student_id)) : disciplineRecords;
+        if (!filtered.length) {
+            body.innerHTML = `<tr><td colspan="9"><div class="empty-state">مورد انضباطی‌ای برای نمایش وجود ندارد.</div></td></tr>`;
+            return;
+        }
+        body.innerHTML = filtered.map((r, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${escapeHtml(r.student_name || "—")}</td>
+                <td>${escapeHtml(r.type || "—")}</td>
+                <td>${escapeHtml(r.title || "—")}</td>
+                <td>${escapeHtml(disciplineSeverityLabels[r.severity] || r.severity || "—")}</td>
+                <td>${escapeHtml(r.record_date || "—")}</td>
+                <td>${escapeHtml(r.description || "—")}</td>
+                <td>${escapeHtml(r.created_by_name || "—")}</td>
+                <td>
+                    <button class="small-btn" data-discipline-edit="${escapeHtml(r.id)}">✏️ ویرایش</button>
+                    <button class="small-btn" data-discipline-delete="${escapeHtml(r.id)}">🗑️ حذف</button>
+                </td>
+            </tr>`).join("");
+    }
+
+    async function saveDisciplineRecord() {
+        const recordId = document.getElementById("disciplineRecordId").value || null;
+        const studentId = document.getElementById("disciplineStudent").value;
+        const type = document.getElementById("disciplineType").value.trim();
+        const title = document.getElementById("disciplineTitle").value.trim();
+        const description = document.getElementById("disciplineDescription").value.trim() || null;
+        const severity = document.getElementById("disciplineSeverity").value;
+        const recordDate = document.getElementById("disciplineDate").value;
+        if (!studentId || !type || !title || !recordDate) {
+            showMessage(document.getElementById("disciplinePageMessage"), "دانش‌آموز، نوع، عنوان و تاریخ را کامل کنید.", "error");
+            return;
+        }
+        const button = document.getElementById("saveDisciplineButton");
+        button.disabled = true;
+        try {
+            const { error } = await supabaseClient.rpc("save_disciplinary_record", {
+                p_record_id: recordId,
+                p_student_id: studentId,
+                p_type: type,
+                p_title: title,
+                p_description: description,
+                p_severity: severity,
+                p_record_date: recordDate
+            });
+            if (error) throw error;
+            showMessage(document.getElementById("disciplinePageMessage"), recordId ? "مورد انضباطی با موفقیت ویرایش شد." : "مورد انضباطی با موفقیت ثبت شد.", "success");
+            resetDisciplineForm();
+            await loadDisciplineRecords();
+        } catch (error) {
+            console.error(error);
+            showMessage(document.getElementById("disciplinePageMessage"), "ثبت مورد انضباطی انجام نشد: " + error.message, "error");
+        } finally { button.disabled = false; }
+    }
+
+    async function editDisciplineRecord(id) {
+        const r = disciplineRecords.find(x => x.id === id);
+        if (!r) return;
+        const student = disciplineStudents.find(st => (st.id || st.student_id) === r.student_id);
+        if (student) {
+            const classId = document.getElementById("disciplineFilterClass").value;
+            if (classId) {
+                document.getElementById("disciplineClass").value = classId;
+                await loadDisciplineStudents(classId, "disciplineStudent", "انتخاب دانش‌آموز");
+            }
+            document.getElementById("disciplineStudent").value = r.student_id;
+        }
+        document.getElementById("disciplineRecordId").value = r.id;
+        document.getElementById("disciplineType").value = r.type || "";
+        document.getElementById("disciplineTitle").value = r.title || "";
+        document.getElementById("disciplineDescription").value = r.description || "";
+        document.getElementById("disciplineSeverity").value = r.severity || "normal";
+        document.getElementById("disciplineDate").value = r.record_date || "";
+        document.getElementById("saveDisciplineButton").textContent = "💾 ذخیره ویرایش";
+        document.getElementById("cancelDisciplineEditButton").style.display = "inline-block";
+        document.getElementById("disciplinePage").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function deleteDisciplineRecord(id) {
+        if (!confirm("آیا از حذف این مورد انضباطی مطمئن هستید؟")) return;
+        const { error } = await supabaseClient.rpc("delete_disciplinary_record", { p_record_id: id });
+        if (error) {
+            showMessage(document.getElementById("disciplinePageMessage"), "حذف انجام نشد: " + error.message, "error");
+            return;
+        }
+        showMessage(document.getElementById("disciplinePageMessage"), "مورد انضباطی حذف شد.", "success");
+        await loadDisciplineRecords();
+    }
+
+    async function loadDisciplineModule() {
+        hideMessage(document.getElementById("disciplinePageMessage"));
+        document.getElementById("disciplineDate").value ||= new Date().toISOString().slice(0,10);
+        await loadDisciplineClasses();
+        await loadDisciplineRecords();
+    }
+
+    document.getElementById("disciplineClass").addEventListener("change", async function() {
+        await loadDisciplineStudents(this.value, "disciplineStudent", "انتخاب دانش‌آموز");
+    });
+
+    document.getElementById("disciplineFilterClass").addEventListener("change", async function() {
+        await loadDisciplineStudents(this.value, "disciplineFilterStudent", "همه دانش‌آموزان");
+        await loadDisciplineRecords();
+    });
+    document.getElementById("disciplineFilterStudent").addEventListener("change", loadDisciplineRecords);
+    document.getElementById("loadDisciplineButton").addEventListener("click", loadDisciplineRecords);
+    document.getElementById("refreshDisciplineButton").addEventListener("click", loadDisciplineModule);
+    document.getElementById("saveDisciplineButton").addEventListener("click", saveDisciplineRecord);
+    document.getElementById("cancelDisciplineEditButton").addEventListener("click", resetDisciplineForm);
+    document.getElementById("disciplineTableBody").addEventListener("click", async function(event) {
+        const editButton = event.target.closest("[data-discipline-edit]");
+        const deleteButton = event.target.closest("[data-discipline-delete]");
+        if (editButton) await editDisciplineRecord(editButton.dataset.disciplineEdit);
+        if (deleteButton) await deleteDisciplineRecord(deleteButton.dataset.disciplineDelete);
+    });
 
 
     /* =========================================================
