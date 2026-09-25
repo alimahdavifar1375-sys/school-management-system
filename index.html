@@ -990,7 +990,7 @@
     
 
 /* GRADES MODULE */
-.grades-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:15px;padding:16px;margin-bottom:15px}
+.grades-controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:15px;padding:16px;margin-bottom:15px}
 .grades-controls .form-group{margin-bottom:0}
 .grades-controls .full{grid-column:1/-1}
 .grades-controls select,.grades-controls input,.grade-score-input,.grade-description-input{width:100%;height:44px;padding:0 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;outline:none;font-family:inherit;font-size:12px}
@@ -1684,6 +1684,13 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="gradesPeriod">نوبت تحصیلی <span class="required">*</span></label>
+                                <select id="gradesPeriod" disabled>
+                                    <option value="">در حال دریافت نوبت‌ها...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
                                 <label for="gradesType">نوع نمره <span class="required">*</span></label>
                                 <select id="gradesType" disabled>
                                     <option value="">ابتدا اطلاعات را دریافت کنید</option>
@@ -1755,54 +1762,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    </section>
-
-                    <!-- REPORT CARD -->
-                    <section id="reportCardSection" class="table-card" style="margin-top:22px;padding:18px">
-                        <div class="page-header" style="padding:0;margin-bottom:15px">
-                            <div>
-                                <h3 style="margin:0">📄 کارنامه دانش‌آموز</h3>
-                                <p>کلاس و دانش‌آموز را انتخاب کنید؛ اطلاعات کارنامه به‌صورت خودکار از همان کلاس دریافت می‌شود.</p>
-                            </div>
-                            <div class="page-actions">
-                                <button id="loadReportCardButton" type="button" class="small-btn success">📄 نمایش کارنامه</button>
-                            </div>
-                        </div>
-                        <div id="reportCardMessage" class="message"></div>
-                        <div class="grades-controls">
-                            <div class="form-group">
-                                <label for="reportCardClass">کلاس</label>
-                                <select id="reportCardClass">
-                                    <option value="">در حال دریافت کلاس‌ها...</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="reportCardStudent">دانش‌آموز</label>
-                                <select id="reportCardStudent" disabled>
-                                    <option value="">ابتدا کلاس را انتخاب کنید</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="reportCardSummary" class="grades-summary">
-                            <span class="summary-badge">میانگین کل: —</span>
-                        </div>
-                        <div class="table-scroll">
-                            <table class="grades-history-table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>درس</th>
-                                        <th>واحد</th>
-                                        <th>نمرات</th>
-                                        <th>میانگین درس</th>
-                                        <th>امتیاز وزنی</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="reportCardBody">
-                                    <tr><td colspan="6"><div class="empty-state">کلاس و دانش‌آموز را انتخاب کنید.</div></td></tr>
-                                </tbody>
-                            </table>
                         </div>
                     </section>
 
@@ -2898,6 +2857,7 @@
     let gradesClasses = [];
     let gradesSubjects = [];
     let gradesTypes = [];
+    let gradesPeriods = [];
     let gradesStudents = [];
     let gradesExisting = [];
     let gradesInitialized = false;
@@ -3048,6 +3008,28 @@
         if (gradesClasses.length === 1) select.value = gradesClasses[0].id;
     }
 
+    async function loadGradesPeriods() {
+        const select = document.getElementById("gradesPeriod");
+        select.disabled = true;
+        select.innerHTML = `<option value="">در حال دریافت نوبت‌ها...</option>`;
+        const { data, error } = await supabaseClient.rpc("get_my_school_grade_periods");
+        if (error) throw error;
+        gradesPeriods = data || [];
+        setGradeSelect(
+            "gradesPeriod",
+            gradesPeriods,
+            gradesPeriods.length ? "انتخاب نوبت" : "هیچ نوبتی تعریف نشده است",
+            p => `${p.name} — ${p.start_date} تا ${p.end_date}`
+        );
+        if (gradesPeriods.length === 1) {
+            select.value = gradesPeriods[0].id;
+        } else if (gradesPeriods.length) {
+            const today = gradeTodayISO();
+            const current = gradesPeriods.find(p => today >= p.start_date && today <= p.end_date);
+            if (current) select.value = current.id;
+        }
+    }
+
     async function loadGradesTypes() {
         const select = document.getElementById("gradesType");
         select.disabled = true;
@@ -3103,8 +3085,9 @@
         const classId = document.getElementById("gradesClass").value;
         const subjectId = document.getElementById("gradesSubject").value || null;
         const typeId = document.getElementById("gradesType").value || null;
+        const periodId = document.getElementById("gradesPeriod").value || null;
         const date = document.getElementById("gradesDate").value || null;
-        if (!classId || !subjectId || !typeId) {
+        if (!classId || !subjectId || !typeId || !periodId) {
             gradesExisting = [];
             return;
         }
@@ -3112,8 +3095,8 @@
             p_class_id: classId,
             p_class_subject_id: subjectId,
             p_grade_type_id: typeId,
-            p_from_date: date,
-            p_to_date: date
+            p_grade_date: date,
+            p_grade_period_id: periodId
         });
         if (error) throw error;
         gradesExisting = data || [];
@@ -3123,10 +3106,11 @@
         const classId = document.getElementById("gradesClass").value;
         const subjectId = document.getElementById("gradesSubject").value || null;
         const typeId = document.getElementById("gradesType").value || null;
+        const periodId = document.getElementById("gradesPeriod").value || null;
         const date = document.getElementById("gradesDate").value || null;
         const body = document.getElementById("gradesHistoryBody");
-        if (!classId || !subjectId || !typeId) {
-            body.innerHTML = `<tr><td colspan="8"><div class="empty-state">کلاس، درس و نوع نمره را انتخاب کنید.</div></td></tr>`;
+        if (!classId || !subjectId || !typeId || !periodId) {
+            body.innerHTML = `<tr><td colspan="8"><div class="empty-state">کلاس، درس، نوبت و نوع نمره را انتخاب کنید.</div></td></tr>`;
             return;
         }
         body.innerHTML = `<tr><td colspan="8"><div class="empty-state">در حال دریافت نمرات...</div></td></tr>`;
@@ -3134,8 +3118,8 @@
             p_class_id: classId,
             p_class_subject_id: subjectId,
             p_grade_type_id: typeId,
-            p_from_date: date,
-            p_to_date: date
+            p_grade_date: date,
+            p_grade_period_id: periodId
         });
         if (error) throw error;
         renderGradesHistory(data || []);
@@ -3148,7 +3132,8 @@
         if (classId) await loadGradesStudents();
         const subjectId = document.getElementById("gradesSubject").value;
         const typeId = document.getElementById("gradesType").value;
-        if (classId && subjectId && typeId) {
+        const periodId = document.getElementById("gradesPeriod").value;
+        if (classId && subjectId && typeId && periodId) {
             await loadGradesExisting();
             renderGradesEntryTable();
             await loadGradesHistory();
@@ -3159,17 +3144,23 @@
         const classId = document.getElementById("gradesClass").value;
         const subjectId = document.getElementById("gradesSubject").value;
         const typeId = document.getElementById("gradesType").value;
+        const periodId = document.getElementById("gradesPeriod").value;
         const date = document.getElementById("gradesDate").value;
         const button = document.getElementById("saveAllGradesButton");
         const gradeType = getSelectedGradeType();
 
         hideMessage(document.getElementById("gradesPageMessage"));
-        if (!classId || !subjectId || !typeId || !date) {
-            showMessage(document.getElementById("gradesPageMessage"), "کلاس، درس، نوع نمره و تاریخ را کامل انتخاب کنید.", "error");
+        if (!classId || !subjectId || !typeId || !periodId || !date) {
+            showMessage(document.getElementById("gradesPageMessage"), "کلاس، درس، نوبت، نوع نمره و تاریخ را کامل انتخاب کنید.", "error");
             return;
         }
         if (!gradesStudents.length) {
             showMessage(document.getElementById("gradesPageMessage"), "این کلاس دانش‌آموزی برای ثبت نمره ندارد.", "error");
+            return;
+        }
+        const selectedPeriod = gradesPeriods.find(p => p.id === periodId);
+        if (!selectedPeriod || date < selectedPeriod.start_date || date > selectedPeriod.end_date) {
+            showMessage(document.getElementById("gradesPageMessage"), "تاریخ نمره خارج از بازه نوبت انتخاب‌شده است.", "error");
             return;
         }
         const maxScore = Number(gradeType?.max_score);
@@ -3205,7 +3196,8 @@
                     p_score: record.score,
                     p_max_score: Number.isFinite(maxScore) ? maxScore : null,
                     p_description: record.description,
-                    p_grade_date: date
+                    p_grade_date: date,
+                    p_grade_period_id: periodId
                 });
                 if (error) throw error;
                 successCount++;
@@ -3228,6 +3220,7 @@
     async function loadGradesModule() {
         if (!gradesInitialized) {
             document.getElementById("gradesDate").value = gradeTodayISO();
+            await loadGradesPeriods();
 
             document.getElementById("gradesClass").addEventListener("change", async function() {
                 try {
@@ -3235,7 +3228,7 @@
                     if (this.value) await loadGradesStudents();
                     const subjectId = document.getElementById("gradesSubject").value;
                     const typeId = document.getElementById("gradesType").value;
-                    if (this.value && subjectId && typeId) {
+                    if (this.value && subjectId && typeId && document.getElementById("gradesPeriod").value) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3249,7 +3242,7 @@
             document.getElementById("gradesSubject").addEventListener("change", async function() {
                 try {
                     await loadGradesStudents();
-                    if (this.value && document.getElementById("gradesType").value) {
+                    if (this.value && document.getElementById("gradesType").value && document.getElementById("gradesPeriod").value) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3257,6 +3250,21 @@
                 } catch (error) {
                     console.error(error);
                     showMessage(document.getElementById("gradesPageMessage"), "دریافت اطلاعات درس انجام نشد: " + error.message, "error");
+                }
+            });
+
+            document.getElementById("gradesPeriod").addEventListener("change", async function() {
+                try {
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value && this.value) {
+                        await loadGradesExisting();
+                        renderGradesEntryTable();
+                        await loadGradesHistory();
+                    } else {
+                        renderGradesEntryTable();
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showMessage(document.getElementById("gradesPageMessage"), "دریافت نمرات این نوبت انجام نشد: " + error.message, "error");
                 }
             });
 
@@ -3277,7 +3285,7 @@
 
             document.getElementById("gradesDate").addEventListener("change", async function() {
                 try {
-                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value) {
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value && document.getElementById("gradesPeriod").value) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3294,12 +3302,13 @@
                 this.disabled = true;
                 try {
                     await loadGradesClasses();
+                    await loadGradesPeriods();
                     await loadGradesTypes();
                     if (document.getElementById("gradesClass").value) {
                         await loadGradesSubjects();
                         if (document.getElementById("gradesSubject").value) await loadGradesStudents();
                     }
-                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value) {
+                    if (document.getElementById("gradesClass").value && document.getElementById("gradesSubject").value && document.getElementById("gradesType").value && document.getElementById("gradesPeriod").value) {
                         await loadGradesExisting();
                         renderGradesEntryTable();
                         await loadGradesHistory();
@@ -3318,7 +3327,6 @@
 
         await loadGradesClasses();
         await loadGradesTypes();
-        await loadReportCardModule();
         if (document.getElementById("gradesClass").value) {
             await loadGradesSubjects();
             if (document.getElementById("gradesSubject").value) await loadGradesStudents();
@@ -3329,264 +3337,6 @@
             await loadGradesHistory();
         }
     }
-
-    /* =========================================================
-       REPORT CARD
-       ========================================================= */
-
-    let reportCardInitialized = false;
-    let reportCardClasses = [];
-    let reportCardStudents = [];
-
-    async function loadReportCardClasses() {
-        const select = document.getElementById("reportCardClass");
-        select.disabled = true;
-        select.innerHTML = `<option value="">در حال دریافت کلاس‌ها...</option>`;
-        const { data, error } = await supabaseClient.rpc("get_my_school_classes");
-        if (error) throw error;
-        reportCardClasses = data || [];
-        setGradeSelect("reportCardClass", reportCardClasses, reportCardClasses.length ? "انتخاب کلاس" : "هیچ کلاسی ثبت نشده است", c =>
-            `${c.name}${c.grade ? " — " + c.grade : ""}${c.section ? " " + c.section : ""}`
-        );
-        if (reportCardClasses.length === 1) {
-            select.value = reportCardClasses[0].id;
-            await loadReportCardStudents();
-        }
-    }
-
-    async function loadReportCardStudents() {
-        const classId = document.getElementById("reportCardClass").value;
-        const select = document.getElementById("reportCardStudent");
-        select.disabled = true;
-        select.innerHTML = `<option value="">در حال دریافت دانش‌آموزان...</option>`;
-        document.getElementById("reportCardBody").innerHTML = `<tr><td colspan="7"><div class="empty-state">دانش‌آموز را انتخاب کنید.</div></td></tr>`;
-        document.getElementById("reportCardSummary").innerHTML = `<span class="summary-badge">میانگین کل: —</span>`;
-        if (!classId) {
-            select.innerHTML = `<option value="">ابتدا کلاس را انتخاب کنید</option>`;
-            return;
-        }
-        const { data, error } = await supabaseClient.rpc("get_class_students_for_grades", { p_class_id: classId });
-        if (error) throw error;
-        reportCardStudents = data || [];
-        select.innerHTML = `<option value="">${reportCardStudents.length ? "انتخاب دانش‌آموز" : "دانش‌آموزی در این کلاس ثبت نشده است"}</option>` + reportCardStudents.map(s =>
-            `<option value="${escapeHtml(s.student_id)}">${escapeHtml([s.first_name, s.last_name].filter(Boolean).join(" ") || "بدون نام")} — ${escapeHtml(s.student_code || "بدون کد")}</option>`
-        ).join("");
-        select.disabled = !reportCardStudents.length;
-    }
-
-    async function loadReportCard() {
-        const classId = document.getElementById("reportCardClass").value;
-        const studentId = document.getElementById("reportCardStudent").value;
-        const body = document.getElementById("reportCardBody");
-        const summary = document.getElementById("reportCardSummary");
-
-        if (!classId || !studentId) {
-            showMessage(document.getElementById("reportCardMessage"), "ابتدا کلاس و دانش‌آموز را انتخاب کنید.", "error");
-            return;
-        }
-
-        body.innerHTML = `<tr><td colspan="6"><div class="empty-state">در حال تولید کارنامه...</div></td></tr>`;
-        hideMessage(document.getElementById("reportCardMessage"));
-
-        try {
-            const [reportResult, averageResult] = await Promise.all([
-                supabaseClient.rpc("get_student_report_card", {
-                    p_student_id: studentId,
-                    p_class_id: classId
-                }),
-                supabaseClient.rpc("calculate_student_weighted_average", {
-                    p_student_id: studentId,
-                    p_class_id: classId
-                })
-            ]);
-
-            if (reportResult.error) throw reportResult.error;
-            if (averageResult.error) throw averageResult.error;
-
-            const reportRows = reportResult.data || [];
-            const averages = averageResult.data || [];
-
-            /*
-             * get_student_report_card تمام دروس کلاس را برمی‌گرداند،
-             * حتی اگر برای دانش‌آموز نمره‌ای ثبت نشده باشد.
-             * بنابراین لیست کارنامه را از reportRows می‌سازیم،
-             * نه فقط از averages.
-             */
-            const subjectMap = new Map();
-
-            reportRows.forEach(row => {
-                if (!subjectMap.has(row.class_subject_id)) {
-                    subjectMap.set(row.class_subject_id, {
-                        class_subject_id: row.class_subject_id,
-                        subject_name: row.subject_name || "—",
-                        units: 0,
-                        grades: []
-                    });
-                }
-
-                const subject = subjectMap.get(row.class_subject_id);
-
-                if (row.max_score != null) {
-                    subject.grades.push(row);
-                }
-            });
-
-            /*
-             * اگر به هر دلیل reportRows برای یک درس خالی باشد ولی تابع
-             * میانگین آن درس را برگرداند، آن درس را هم حفظ می‌کنیم.
-             */
-            averages.forEach(row => {
-                if (!subjectMap.has(row.class_subject_id)) {
-                    subjectMap.set(row.class_subject_id, {
-                        class_subject_id: row.class_subject_id,
-                        subject_name: row.subject_name || "—",
-                        units: 0,
-                        grades: []
-                    });
-                }
-            });
-
-            const avgMap = new Map(
-                averages.map(x => [x.class_subject_id, x])
-            );
-
-            const subjectRows = Array.from(subjectMap.values())
-                .map((subject, index) => {
-                    const average = avgMap.get(subject.class_subject_id);
-                    const units = average
-                        ? Number(average.units || 0)
-                        : Number(subject.units || 0);
-
-                    return {
-                        ...subject,
-                        index: index + 1,
-                        units,
-                        average_score: average?.average_score != null
-                            ? Number(average.average_score)
-                            : null,
-                        weighted_score: average?.weighted_score != null
-                            ? Number(average.weighted_score)
-                            : null
-                    };
-                })
-                .sort((a, b) =>
-                    String(a.subject_name).localeCompare(
-                        String(b.subject_name),
-                        'fa'
-                    )
-                )
-                .map((row, index) => ({
-                    ...row,
-                    index: index + 1
-                }));
-
-            const gradedSubjects = subjectRows.filter(
-                row => row.average_score != null
-            );
-
-            const overallRow = averages.find(
-                x => x.overall_average != null
-            );
-
-            const overall = overallRow
-                ? Number(overallRow.overall_average).toFixed(2)
-                : "—";
-
-            const totalUnits = subjectRows.reduce(
-                (sum, row) => sum + Number(row.units || 0),
-                0
-            );
-
-            const gradedUnits = gradedSubjects.reduce(
-                (sum, row) => sum + Number(row.units || 0),
-                0
-            );
-
-            summary.innerHTML = `
-                <span class="summary-badge">میانگین کل وزنی: ${overall}</span>
-                <span class="summary-badge">تعداد دروس: ${subjectRows.length}</span>
-                <span class="summary-badge">دروس دارای نمره: ${gradedSubjects.length}</span>
-                <span class="summary-badge">مجموع واحدها: ${totalUnits}</span>
-                <span class="summary-badge">واحدهای محاسبه‌شده: ${gradedUnits}</span>
-            `;
-
-            if (!subjectRows.length) {
-                body.innerHTML = `
-                    <tr>
-                        <td colspan="6">
-                            <div class="empty-state">
-                                <div class="icon">📄</div>
-                                <div>برای این کلاس درسی ثبت نشده است.</div>
-                            </div>
-                        </td>
-                    </tr>`;
-                return;
-            }
-
-            body.innerHTML = subjectRows.map(row => {
-                const gradeDetails = row.grades.length
-                    ? row.grades.map(x => `
-                        <div style="margin-bottom:4px">
-                            ${escapeHtml(x.grade_type_name || "نمره")}:
-                            <strong>${escapeHtml(x.score ?? "—")}</strong>
-                            / ${escapeHtml(x.max_score ?? "—")}
-                            ${x.grade_date ? ` <small>(${escapeHtml(x.grade_date)})</small>` : ""}
-                        </div>
-                    `).join("")
-                    : `<span style="color:#888">هنوز نمره‌ای ثبت نشده</span>`;
-
-                return `
-                    <tr>
-                        <td>${row.index}</td>
-                        <td><strong>${escapeHtml(row.subject_name)}</strong></td>
-                        <td>${escapeHtml(row.units)}</td>
-                        <td>${gradeDetails}</td>
-                        <td>
-                            <strong>
-                                ${row.average_score != null
-                                    ? row.average_score.toFixed(2)
-                                    : "—"}
-                            </strong>
-                        </td>
-                        <td>
-                            ${row.weighted_score != null
-                                ? row.weighted_score.toFixed(2)
-                                : "—"}
-                        </td>
-                    </tr>`;
-            }).join("");
-
-        } catch (error) {
-            console.error("report card:", error);
-            body.innerHTML = `
-                <tr>
-                    <td colspan="6">
-                        <div class="empty-state">دریافت کارنامه انجام نشد.</div>
-                    </td>
-                </tr>`;
-            showMessage(
-                document.getElementById("reportCardMessage"),
-                "دریافت کارنامه انجام نشد: " + error.message,
-                "error"
-            );
-        }
-    }
-
-    async function loadReportCardModule() {
-        if (!reportCardInitialized) {
-            document.getElementById("reportCardClass").addEventListener("change", async function() {
-                try { await loadReportCardStudents(); }
-                catch (error) { showMessage(document.getElementById("reportCardMessage"), "دریافت دانش‌آموزان انجام نشد: " + error.message, "error"); }
-            });
-            document.getElementById("loadReportCardButton").addEventListener("click", loadReportCard);
-            document.getElementById("reportCardStudent").addEventListener("change", function() {
-                if (this.value) loadReportCard().catch(console.error);
-            });
-            reportCardInitialized = true;
-        }
-        await loadReportCardClasses();
-    }
-
 
     /* =========================================================
        TEACHERS MANAGEMENT
