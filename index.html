@@ -1793,15 +1793,14 @@
                                     <tr>
                                         <th>#</th>
                                         <th>درس</th>
-                                        <th>نوع نمره</th>
-                                        <th>نمره</th>
-                                        <th>تاریخ</th>
-                                        <th>توضیح</th>
+                                        <th>واحد</th>
+                                        <th>نمرات</th>
                                         <th>میانگین درس</th>
+                                        <th>امتیاز وزنی</th>
                                     </tr>
                                 </thead>
                                 <tbody id="reportCardBody">
-                                    <tr><td colspan="7"><div class="empty-state">کلاس و دانش‌آموز را انتخاب کنید.</div></td></tr>
+                                    <tr><td colspan="6"><div class="empty-state">کلاس و دانش‌آموز را انتخاب کنید.</div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -3384,39 +3383,53 @@
             showMessage(document.getElementById("reportCardMessage"), "ابتدا کلاس و دانش‌آموز را انتخاب کنید.", "error");
             return;
         }
-        body.innerHTML = `<tr><td colspan="7"><div class="empty-state">در حال تولید کارنامه...</div></td></tr>`;
+        body.innerHTML = `<tr><td colspan="6"><div class="empty-state">در حال تولید کارنامه...</div></td></tr>`;
         hideMessage(document.getElementById("reportCardMessage"));
         try {
             const [reportResult, averageResult] = await Promise.all([
                 supabaseClient.rpc("get_student_report_card", { p_student_id: studentId, p_class_id: classId }),
-                supabaseClient.rpc("calculate_student_average", { p_student_id: studentId, p_class_id: classId })
+                supabaseClient.rpc("calculate_student_weighted_average", { p_student_id: studentId, p_class_id: classId })
             ]);
             if (reportResult.error) throw reportResult.error;
             if (averageResult.error) throw averageResult.error;
             const rows = reportResult.data || [];
             const averages = averageResult.data || [];
             const avgMap = new Map(averages.map(x => [x.class_subject_id, Number(x.average_score)]));
-            const uniqueAverages = averages.map(x => Number(x.average_score)).filter(Number.isFinite);
-            const overall = uniqueAverages.length ? (uniqueAverages.reduce((a,b) => a+b, 0) / uniqueAverages.length).toFixed(2) : "—";
-            summary.innerHTML = `<span class="summary-badge">میانگین کل: ${overall}</span><span class="summary-badge">تعداد درس: ${averages.length}</span>`;
-            if (!rows.length) {
-                body.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">📄</div><div>برای این دانش‌آموز هنوز نمره‌ای ثبت نشده است.</div></div></td></tr>`;
+            const unitsMap = new Map(averages.map(x => [x.class_subject_id, Number(x.units || 0)]));
+            const weightedMap = new Map(averages.map(x => [x.class_subject_id, Number(x.weighted_score || 0)]));
+            const overall = averages.length && averages.some(x => x.overall_average != null)
+                ? Number(averages.find(x => x.overall_average != null).overall_average).toFixed(2)
+                : "—";
+            const subjectRows = averages.map((a, i) => ({
+                ...a,
+                index: i + 1,
+                average_score: Number(a.average_score),
+                units: Number(a.units || 0),
+                weighted_score: Number(a.weighted_score || 0)
+            }));
+            summary.innerHTML = `<span class="summary-badge">میانگین کلِ وزنی: ${overall}</span><span class="summary-badge">تعداد درس: ${averages.length}</span><span class="summary-badge">مجموع واحد: ${averages.reduce((sum, x) => sum + Number(x.units || 0), 0)}</span>`;
+            if (!subjectRows.length) {
+                body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📄</div><div>برای این دانش‌آموز هنوز نمره‌ای ثبت نشده است.</div></div></td></tr>`;
                 return;
             }
-            body.innerHTML = rows.map((r, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${escapeHtml(r.subject_name || "—")}</td>
-                    <td>${escapeHtml(r.grade_type_name || "—")}</td>
-                    <td><strong>${escapeHtml(r.score ?? "—")}</strong> <small>/ ${escapeHtml(r.max_score ?? "—")}</small></td>
-                    <td>${escapeHtml(r.grade_date || "—")}</td>
-                    <td>${escapeHtml(r.description || "—")}</td>
-                    <td>${avgMap.has(r.class_subject_id) ? avgMap.get(r.class_subject_id).toFixed(2) : "—"}</td>
-                </tr>
-            `).join("");
+            body.innerHTML = subjectRows.map(r => {
+                const gradeDetails = rows
+                    .filter(x => x.class_subject_id === r.class_subject_id)
+                    .map(x => `${escapeHtml(x.grade_type_name || "نمره")} : <strong>${escapeHtml(x.score ?? "—")}</strong>/${escapeHtml(x.max_score ?? "—")}`)
+                    .join("<br>");
+                return `
+                    <tr>
+                        <td>${r.index}</td>
+                        <td><strong>${escapeHtml(r.subject_name || "—")}</strong></td>
+                        <td>${escapeHtml(r.units)}</td>
+                        <td>${gradeDetails || "—"}</td>
+                        <td><strong>${Number.isFinite(r.average_score) ? r.average_score.toFixed(2) : "—"}</strong></td>
+                        <td>${Number.isFinite(r.weighted_score) ? r.weighted_score.toFixed(2) : "—"}</td>
+                    </tr>`;
+            }).join("");
         } catch (error) {
             console.error("report card:", error);
-            body.innerHTML = `<tr><td colspan="7"><div class="empty-state">دریافت کارنامه انجام نشد.</div></td></tr>`;
+            body.innerHTML = `<tr><td colspan="6"><div class="empty-state">دریافت کارنامه انجام نشد.</div></td></tr>`;
             showMessage(document.getElementById("reportCardMessage"), "دریافت کارنامه انجام نشد: " + error.message, "error");
         }
     }
